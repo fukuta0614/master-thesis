@@ -1,0 +1,17 @@
+.DS_Store
+*.toc
+*.log
+*.dvi
+*.aux
+*.bbl
+*.blg
+*.toc
+*.flc
+*.bak
+*.bmc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+syuron.md
+node_modules
+TODO

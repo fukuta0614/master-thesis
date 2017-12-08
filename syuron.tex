@@ -1,0 +1,88 @@
+%region メタ情報・前文
+\documentclass[master]{cimt}
+% オプションについては，マニュアルを参照．
+% \documentclass[master,oneside]{cimt} 
+
+% 必要とするパッケージがあれば，ここで指定する．
+\usepackage[dvipdfmx]{graphicx,color}
+\usepackage{url}
+\usepackage{layout}
+\usepackage[fleqn]{amsmath}
+\usepackage[psamsfonts]{amssymb}
+\usepackage{multirow}
+\usepackage{listings,jlisting,upquote}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{color}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
+\newcommand{\todo}[1]{{\color{red} ToDo: {#1}}}
+\newcommand{\com}[1]{{\color{blue}(#1)}}
+
+% 論文タイトル
+\jtitle{病理画像解析支援のための深層能動学習に関する研究}
+\etitle{Cost effective learning of pathological images with deep active learning}
+\jauthor{福田　圭佑}
+\eauthor{Keisuke Fukuta}
+\supervisor{原田 達也 教授}
+\handin{2018}{1} % 提出月 2018/1
+
+\begin{document}
+
+\maketitle 
+
+\frontmatter{}
+
+\begin{jabstract}
+  \input jabst.tex
+\end{jabstract}
+
+\begin{eabstract}
+  \input eabst.tex
+\end{eabstract}
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\mainmatter{}
+
+\input intro.tex
+\input related.tex
+\input al.tex
+\input body.tex
+\input concl.tex
+
+%endregion
+
+%region 後付
+\backmatter{}
+
+% 参考文献: BibTeX を使う場合の例 (styleは適宜選択)
+\bibliographystyle{junsrt}
+\bibliography{syuron}
+
+% 謝辞 (前文においても良い)
+\begin{acknowledgements}
+TODO
+\end{acknowledgements}
+
+%付録 (必要な場合のみ)
+\appendix
+
+\chapter{ソースコード}
+  \begin{verbatim}
+    int main () {
+      ...
+      ...
+    }
+  \end{verbatim}
+
+\end{document}
+%endregion
+%endregion

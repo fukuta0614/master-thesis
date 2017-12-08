@@ -1,0 +1,19 @@
+{
+  "name": "syuron",
+  "version": "1.0.0",
+  "description": "[創造情報学専攻が配布しているテンプレート][template]を整理したものです",
+  "main": "index.js",
+  "scripts": {
+    "lint": "textlint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kiikurage/master-thesis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "textlint": "^9.1.1",
+    "textlint-rule-prh": "^5.0.1"
+  }
+}

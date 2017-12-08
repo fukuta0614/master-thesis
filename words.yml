@@ -1,0 +1,30 @@
+meta:
+  related: http://gihyo.jp/magazine/wdpress
+  rules:   https://github.com/prh/rules
+
+version: 1
+
+rules:
+  - pattern: (
+    expected: （
+  - pattern: )
+    expected: ）
+  - pattern: 計算不可
+    expected: 計算負荷
+  - pattern: 。
+    expected: ．
+  - pattern: 、
+    expected: ，
+  - pattern: 出来
+    expected: でき
+  - pattern: 誤差逆伝搬法
+    expected: 逆誤差伝搬法
+  - pattern: 学習済みDNNモデル
+    expected: 学習済みモデル
+  - pattern: DNNモデル
+    expected: モデル
+  - pattern: 
+      - 事無く
+      - こと無く
+      - 事なく
+    expected: ことなく
