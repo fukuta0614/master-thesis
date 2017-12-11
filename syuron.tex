@@ -25,6 +25,22 @@
 \newcommand{\todo}[1]{{\color{red} ToDo: {#1}}}
 \newcommand{\com}[1]{{\color{blue}(#1)}}
 
+\usepackage[dvipdfmx,bookmarks=true,setpagesize=false]{hyperref}
+\usepackage{pxjahyper} % http://konoyonohana.blog.fc2.com/blog-entry-68.html
+\hypersetup{
+  bookmarksopen=true,
+  bookmarksnumbered=true,
+  bookmarksopenlevel=1,
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  filecolor=black,
+  menucolor=magenta,
+  urlcolor=blue,
+  pdftitle={},
+  pdfauthor={ISI}
+}
+
 % 論文タイトル
 \jtitle{病理画像解析支援のための深層能動学習に関する研究}
 \etitle{Cost effective learning of pathological images with deep active learning}
@@ -65,7 +81,7 @@
 
 % 参考文献: BibTeX を使う場合の例 (styleは適宜選択)
 \bibliographystyle{junsrt}
-\bibliography{syuron}
+\bibliography{mendeley}
 
 % 謝辞 (前文においても良い)
 \begin{acknowledgements}

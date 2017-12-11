@@ -1,8 +1,18 @@
-\chapter{Active Learning 能動学習}
+\chapter{能動学習}
+\section{基本的な概念}
+
+ラベルなしデータ集合 $\mathcal{U} = \{x_1, \cdots, x_n\}$を与えられた時に
+
 能動学習，Active Learning\cite{settles2010active}とは，機械学習における一つの枠組みである．
 一般に，教師つき学習において識別精度の高いモデルを学習させるためには膨大なアノテーション付きデータが必要となる．
 そこで，能動学習では，得られた大量のラベルなしデータから最もモデル更新に寄与する可能性のあるサンプルを調べ，
 それにアノテーションを付与することで，少ないアノテーションコストのもとでいかに高精度な学習モデルを作成するかを目的としている．
+
+機械学習では，教師データ作成コストが問題となる場合が多く，少量のデータから効率的に学習する枠組みが重要視されている．
+少量のデータからの学習として，能動学習(Active Learning），転移学習（transfer learning)が提案されている．
+能動学習は，教師データの作成コストが大きい場合に用いられる枠組みで，一部のデータのみに選択的にラベルを付ける方法である．
+
+学習に用いられる識別器としては，データxが与えられら時のラベルが正例である確率が定義されているもの.
 
 能動学習の基本的な流れを以下に示す
 \begin{description}
@@ -25,5 +35,35 @@
 
 サンプリングバイアス
     能動学習で得られたデータ集合は実際のデータ集合とは異なる
+
+\section{能動学習の適用される状況}
+
+\begin{description}
+    \item[Membership Query Synthesis]\mbox{}\\ 
+        Membership Query Synthesis はストリーミングデータ (サンプルが次々に入力されていくような場合) に対するアプローチで，
+        ストリーミングデータを直接，人間に提示してラベルを付けるのではなく，1つまたは複数のサンプルから新しいサンプルを生成し人間に
+        提示する事でラベル付けを行う方法である．図 1.3 に Membership Query Synthesis の流
+        れを示す．
+    \item[Stream-Based Selective Sampling]\mbox{}\\
+        Stream-Based Selective Sampling は Membership Query Synthesis と同じストリーミン
+        グデータに対する手法であるが，入力されるストリーミングデータに対してそれぞれのサ
+        ンプルにラベルを付けるかを判断し，ラベルを付けると判断しサンプルを人間に提示する
+        方式である．図 1.4 に Stream-Based Selective Sampling の流れを示す．
+    \item[Pool-Based Sampling]\mbox{}\\
+        上記の 2 つがストリーミングデータに対するものであったが，Pool-Based Sampling は
+        まとまったサンプルに対するアプローチである．サンプルプール (複数のサンプル) を扱
+        うためサンプルの持つ情報量の計算が容易でである．また，入力サンプルの確率分布を予
+        測することもでき，プールの中からサンプルを選択する方法である．ただし，サンプルの
+        保存や，大きなサンプルプールに対して計算を行う必要があるため機器のストレージやメ
+        モリ，演算能力などが求められる．このためモバイル機器のような機器では扱えない場合
+        がある．図 1.5 に Pool-Based Sampling の流れを示す．
+\end{description}
+
+\section{選考基準}
+
+\subsection{Uncertainty Sampling}
+\subsection{Extracting Data Structure}
+\subsection{Query By Committee}
+\subsection{Expected Model Change / Expected Varance Reduction}
 
 

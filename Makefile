@@ -1,4 +1,4 @@
-.PHONY: watch build clean precompile
+ .PHONY: watch build clean precompile
 
 default:
 	$(MAKE) watch
