@@ -22,7 +22,7 @@
 \newcommand{\argmin}{\operatornamewithlimits{argmin}}
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
 
-\newcommand{\todo}[1]{{\color{red} ToDo: {#1}}}
+\newcommand{\todo}[1]{{\color{red} (ToDo: {#1})}}
 \newcommand{\com}[1]{{\color{blue}(#1)}}
 
 \usepackage[dvipdfmx,bookmarks=true,setpagesize=false]{hyperref}
@@ -63,32 +63,37 @@
   \input eabst.tex
 \end{eabstract}
 
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 \tableofcontents
+\listoffigures
+\listoftables
 
 \mainmatter{}
 
 \input 1_intro.tex
-\input 2_related.tex
-\input 3_al.tex
+\input 2_preliminary.tex
+\input 3_related.tex
 \input 4_method.tex
-\input 5_experiment.tex
-\input 6_concl.tex
+\input 5_experiment_1.tex
+\input 6_experiment_2.tex
+\input 7_concl.tex
 
 %region 後付
 \backmatter{}
 
 % 参考文献: BibTeX を使う場合の例 (styleは適宜選択)
 \bibliographystyle{junsrt}
-\bibliography{mendeley, reference}
+\bibliography{reference}
 
 % 謝辞 (前文においても良い)
+
 \begin{acknowledgements}
-TODO
+\input ack.tex
 \end{acknowledgements}
 
 %付録 (必要な場合のみ)
 \appendix
+
 
 \chapter{ソースコード}
   \begin{verbatim}

@@ -1,0 +1,1825 @@
+\documentclass[master]{cimt}
+
+\DeclareMathAlphabet{\mathitbf}{OT1}{cmr}{bx}{it}
+\DeclareSymbolFont{lettbf}{OML}{cmm}{b}{it}
+\DeclareMathSymbol{\valpha}{0}{lettbf}{"0B}
+\DeclareMathSymbol{\vbeta}{0}{lettbf}{"0C}
+\DeclareMathSymbol{\vgamma}{0}{lettbf}{"0D}
+\DeclareMathSymbol{\vzeta}{0}{lettbf}{"10}
+\DeclareMathSymbol{\veta}{0}{lettbf}{"11}
+\DeclareMathSymbol{\vth}{0}{lettbf}{"12}
+\DeclareMathSymbol{\vomega}{0}{lettbf}{"21}
+\DeclareMathSymbol{\vxi}{0}{lettbf}{"18}
+\DeclareMathSymbol{\vvarphi}{0}{lettbf}{"27}
+\DeclareMathSymbol{\vpi}{0}{lettbf}{"24}
+\DeclareMathSymbol{\vpsi}{0}{lettbf}{"20}
+
+
+\newtheorem{thm}{定理}
+\newtheorem{lma}{補題}
+\newtheorem{cor}{系}
+\newtheorem{prop}{命題}
+\newtheorem{dfn}{定義}
+
+
+\newcommand{\parder}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\hvth}{\widehat{{\vth}}}
+\newcommand{\vx}{\mathitbf{x}}
+\newcommand{\vy}{\mathitbf{y}}
+\newcommand{\vz}{\mathitbf{z}}
+\newcommand{\vv}{\mathitbf{v}}
+\newcommand{\va}{\mathitbf{a}}
+\newcommand{\vb}{\mathitbf{b}}
+\newcommand{\vw}{\mathitbf{w}}
+\newcommand{\vu}{\mathitbf{u}}
+\newcommand{\vf}{\mathitbf{f}}
+\newcommand{\vs}{\mathitbf{s}}
+\newcommand{\upm}{^{[m]}}
+\newcommand{\idx}{^{(i)}}
+\newcommand{\prob}{\mathrm{Prob}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\trace}{\text{Tr}}
+
+\usepackage[dvipdfmx]{graphicx,color}
+\usepackage{url}
+\usepackage{layout}
+\usepackage[fleqn]{amsmath}
+\usepackage[psamsfonts]{amssymb}
+\usepackage{multirow}
+\usepackage{listings,jlisting,upquote}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{color}
+
+\begin{document}
+
+\chapter{能動学習の理論}
+
+\section{能動的な学習とは何か？}
+
+ここでは「能動学習（active learning）」の基本的な概念
+を説明し，本章で解説する機械学習における能動学習
+について概観したい．
+学習という用語の意味を，
+データを用いることにより，システムの持つパラメータをある規準に
+従って最適化していくプロセスだと定めることにしよう．この定義は，
+本章で述べるような確率的データによる
+機械学習にもあてはまるし，学習に用いられるシステムが
+脳であり，脳の神経細胞を結ぶ結合状態がシステムパラメータだと考えれば，
+我々の脳における学習にもあてはまるであろう．
+
+データから知識を獲得する機械学習の理論では，
+与えられたデータに対してシステム設計者が適切なモデルを設定し，
+問題に沿った規準（目的関数）を最適化するように学習を行う，という
+枠組みで議論が進められることが多い．ここで着目して欲しいのは，
+「あらかじめ与えられたデータ」を学習の出発点としている点である．
+一方，我々人間が通常行っている学習を振り返ると，
+受動的に与えられた情報だけを使って知識を獲得しているわけではない．
+小さな子供は「あれは何？」と周囲に質問をさかんに発し，また自ら
+試行錯誤を繰り返しながら成長していく．抽象的に言えば，
+このような学習の方法は，自発的にデータを収集して
+いくという意味において「能動的」な学習だと考えることが出来る．
+
+機械でも能動的に学習すればより効果的な学習が行えるに
+違いない --- この発想が能動学習の原点である．すなわち，機械学習における
+能動学習とは，学習データ
+があらかじめ受動的に与えられていると考えず，学習に都合のよい
+データの採取法を機械自らに設計させようという方法論である．
+このような能動学習の方法論は，
+機械が実世界の知識を獲得する場合に特に
+重要となる．
+例えば，チームを組んでサッカーの試合を行うロボットの行動戦略
+を作ることを考えてみよう．このためには多様な局面に対して適切に
+行動するようにロボットをプログラムする必要があるが，受動的なデータに
+よってロボットを学習させようとすると，設計者は，考えられる限りのゲームの局面と
+それに対する行動パターンをデータ化してロボットに与えなければならない．
+この場合，強い戦略を獲得するためにどのようなデータを与えればよいのか
+を決めることは難しく，むしろロボットが実際に試合を行い，
+時には試してみたい局面を故意に作り出し，試行錯誤の中でよりよい戦略を学習
+していく方がよさそうである．
+このように，限られた状況下で定まったタスクを実行する機械から，
+複雑な実世界の知識を柔軟に獲得していく機械へと要請が移るにつれて，
+機械が主体的にデータを収集する能動学習の重要度が増してきている．
+
+あとで詳しく述べるように，最適なデータ採取法という観点から見ると，能動学習の
+ひとつの形態は「最適実験計画」と呼ばれる統計学の一分野の中で古くから
+研究されてきた．しかしながら，それらの研究は，機械を
+線形回帰モデルなど単純なモデルに限定し，データを採取する入力点を理論的に
+最適設計することに主眼が置かれていた．
+一方「能動学習」という呼び方には，データの採取と機械のパラメータ最適化を逐次的に
+行っていくという意味合いが込められている．このようなデータとパラメータの逐次的な
+最適化が活発に議論されるようになった理由のひとつには，
+計算機の発達によりデータを収集しながら実環境下で学習することが
+現実的になってきたことが挙げられよう．
+
+本章では，このような能動学習の理論的な枠組みについて
+述べる．一口に効果的なデータの採取法といってもその実現の
+仕方はさまざまであり，機械が解こうとしている問題の種類によっても
+アプローチが異なる．本章では，入力から出力への
+入出力関係をニューラルネットなどの非線形回帰モデル
+を用いて学習する問題を対象とし，
+最終的な関数の推定精度
+ないしは汎化誤差を最適化するように，パラメータの最適化と
+データ採取点の最適化を交互に行っていく方法を中心に述べる．
+
+
+\section{確率的なデータからの入出力関係の学習}
+
+まず準備として，入力 $\vx$ から出力 $y$ への入出力関係を，
+有限個の確率的なデータから推定する問題を理論的に
+定式化する．このような枠組みは，入力である文字画像から文字コードを
+出力する文字認識の問題や，現在の経済指標を入力することにより次期の
+経済指標を出力する時系列予測の問題など，様々な現実の設定を含んでいる．
+
+
+\subsection{確率的な動作をするシステム}
+\label{sec:stat_learning}
+
+$L$ 次元の入力ベクトル $x$ を与えると $M$ 次元の出力ベクトル $y$ 
+を返すシステムを考えよう．
+現実に遭遇する多くの問題では，入出力関係が必ずしも
+決定論的に 
+$
+y = \vf(x)
+$
+という関数関係で記述できるわけではなく，
+確率的な要素を含んでいることも多い．経済指標の予測などでは，
+過去の経済指標によって次期の値が完全に決定されるとは考え難いし，
+文字認識の問題でも，
+手書き数字の「１」と「７」の識別では，書き手の癖などによって
+ほとんど同じ画像が異なる数を表していることもありえる．
+そこで決定論的な関数で表現できない部分は確率的要素として
+扱うことにし，ある入力 $x$ が与えられたときの
+出力 $y$ の条件付き確率によって，
+学習対象である真のシステムの確率的な入出力関係を表す．
+この条件付確率の密度関数を
+\begin{equation}
+\label{eq:cond_prob}
+	p( y | x )
+\end{equation}
+とおく．
+このシステムに $n$ 個の入力データ $\{ x_i\}_{i=1}^n$ を与えると，
+$\{  y_i \}_{i=1}^n$ が(\ref{eq:cond_prob})式の
+条件付き確率に従って発生するが，今後の議論では異なる $i$ に対して
+$\{  y_i \}_{i=1}^n$ は互いに独立であると仮定する．
+さらに，システムは，通常の状態ではある一定の環境に置かれており，
+決まった確率 $Q$ に従う入力ベクトルを受け取っていると
+考えよう．以下，入力確率 $Q$ の密度関数を $q(x)$ で表す．
+
+本章で述べる能動学習の枠組みでは，学習者が与えた
+どんな入力データに対しても，(\ref{eq:cond_prob})式の確率的ルールに従って
+出力データを返答するシステムを想定する．
+以下では話をさらに簡単にするために，この
+確率的ルールが，決定論的な関数 $\varphi_o(x)$ と条件付き確率 $r(y | 
+\vs)$ を用いて
+\begin{equation*}
+	p(y | x) =  r( y | \vvarphi_o(x) )
+\end{equation*}
+と表されると仮定する．
+ここで，確率的要素 $r(y | \vs) $ はノイズや揺らぎなどの不確定要因を
+表現している．以下で二つの例を示そう．
+
+\medskip
+\noindent
+{\bf 例１：加法的ガウスノイズ}\hskip0.5cm
+入力ベクトル $x$ に対して，
+決定論的な出力 $\vvarphi(x)$ に，平均0分散共分散行列 $\sigma^2 I_M$ 
+の独立なガウスノイズ $\vz$ が加わったものが $y$ として観測されるとしよう．
+このとき，
+\begin{equation*}
+	y = \vvarphi(x) + \vz
+\end{equation*}
+と表される．条件付き確率密度関数で書けば，
+\begin{equation*}
+	p(y | x ) = \frac{1}{(2\pi \sigma^2)^{M/2}} \exp \Bigl\{ 
+	- \frac{1}{2\sigma^2} \| y - \vvarphi(x) \|^2 \Bigr\}
+\end{equation*}
+となる．
+ 
+\noindent
+{\bf 例２：２クラスの識別問題}\hskip0.5cm
+パターンを２つのクラスに識別する問題では，
+出力 $y$ が $\{ 1, 0 \}$ に値を取るとして
+\begin{equation*}
+	r( y | s ) = \frac{e^{ys}}{1+e^s}
+\end{equation*}
+という確率的要素を導入し，
+\begin{equation*}
+	p(y | x) = r(y| \varphi(x)) = 
+	\frac{e^{y \varphi(x) }}{1+e^{\varphi(x)}}
+\end{equation*}
+というルールを考えることがよく行われる．
+これは，$y = 1$ となる確率が $1/(1+ e^{- \varphi(x) })$ となる
+モデルである．関数 $1/(1+e^{-s})$ はロジスティック関数
+と呼ばれ図\ref{fig:logistic}のようなグラフを持つ．
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%   \epsfysize=3cm
+%   \epsfbox{ps/logistic.eps}
+% \caption{ロジスティック関数 $\frac{1}{1 + e^{-s}}$}
+% \label{fig:logistic}
+% \end{center}
+% \end{figure}
+
+\subsection{入出力関係の学習}
+確率的なシステムの背後にある関数関係 $\vvarphi_o(x)$ を
+学習するために，ここではパラメトリックな方法論を取る．
+すなわち，真の関数関係 $\vvarphi_o(x)$ の候補となる関数族
+$\{ \vvarphi(x; \vth) \mid \vth \in \Theta \}$ （$\vth \in \Theta$ 
+は$d$次元のパラメータベクトル）と，
+真のシステムから得られた学習データ $\{(x_i, 
+y_i)\}_{i=1}^n$ を用意し，真の関数関係を精度よく推定できる
+ように，学習データを用いてパラメータ $\vth$ を最適化する．
+
+まず，関数族に関して考えよう．本節ではこのようなパラメトリックな関数
+のことを学習機械と考える．
+学習機械の設定の仕方はシステムの設計者に
+任されている．問題の本質を汲み上げて，なるべく高い性能の機械が出来るように
+モデル化するのがよい．問題の構造に関する十分な知識がある場合には，
+それを適切に表現する
+パラメトリックな関数族を設定できることもある．しかしながら，
+例えば文字認識の問題において，濃淡画像や
+特徴ベクトルの空間から文字コードへの写像をよく表すモデルを我々が想像すること
+はほとんど不可能である．そのため，問題の構造を直接モデル化するのではなく，
+さまざなま関数の近似が可能な汎用関数系を用意して，それによって未知なる
+真の関数関係を学習しようとする方針もありえる．後者のような立場で選択
+される関数族として，
+多層パーセプトロンや Radial Basis Funcitons (RBF) に代表される
+ニューラルネットワークがある．後に述べる応用ではニューラルネット
+を用いた例を述べる．
+
+次に学習データの採取法であるが，これには入力データを真のシステムに
+与えて出力データを観測する必要がある．このとき，システムに与える
+入力データ $\{x_i\}_{i=1}^n$ は，必ずしも真のシステムが通常置かれている
+環境の入力分布 $Q$ から発生したものを用いる必要はない．
+この入力データをどのように設計すればよいかが能動学習の問題となる．
+その具体的な設計法は後で説明するとして，ここではある定まった
+入力データ $X_n = \{x_i\}_{i=1}^n$ に対して出力データ 
+$Y_n = \{y_i\}_{i=1}^n$ 
+が観測され，
+学習データ $\{ (x^{(i)}, y^{(i)}) \}_{i=1}^n$ が得られたと
+する．
+
+やや天下り的であるが，以降入力データ $X_n = \{x_i\}_{i=1}^n$ の性質として，
+密度関数 $u(x)$ を持つある確率分布 $U$ が存在して，
+$x$ の $U$ に関する任意の可積分関数 $g(x)$ のサンプル平均
+が，大数の法則
+\begin{equation}
+\label{eq:LLN}
+	\frac{1}{n} \sum_{i=1}^n g(x_i) \quad 
+	\longrightarrow \quad \int g(x)u(x)dx  \qquad (n \to \infty)
+\end{equation}
+を満たすことを仮定する．
+また，学習データ $\{(x_i,y_i)\}_{i=1}^n$ に対しては
+可積分関数 $h(x,y)$ のサンプル平均が
+\begin{equation}
+\label{eq:LLN2}
+	\frac{1}{n} \sum_{i=1}^n h(x_i,y_i) \quad 
+	\longrightarrow \quad \int\int h(x,y)r(y|\varphi_o(x))
+	u(x)dy dx  
+	\qquad (n \to \infty)
+\end{equation}
+と収束することを仮定する．
+
+学習機械と学習データを用いて真の関数関係の学習を行うためには，
+学習の目的を定義する目的関数を決める必要がある．
+そのために，$M$ 次元ベクトル $y$ と $\vs$ の近さを測る{\em 損失関数}
+（loss function）
+ $\ell (y, \vs)$ を用意し，与えられたデータに対する{\em 経験損失関数} 
+ （empirical loss function）$L_n(\vth)$ を
+\begin{equation}
+\label{eq:Ln}
+  L_n(\vth) = \frac{1}{n} \sum_{i=1}^n 
+  	\ell( y_i, \vvarphi(x_i; \vth) )
+\end{equation}
+により定義する．この $L_n(\vth)$ を最小にすることを学習の目的と
+考え，その最小値をとるパラメータを $\hvth$ と書く．
+損失関数 $\ell(y,\vs)$ の満たすべき条件として，任意の $\vs_1$, $\vs_2$ 
+に対して
+\begin{equation}
+\label{eq:loss_assump}
+	\int \ell(y, \vs_2) r(y| \vs_1) dy 
+	\geq \int \ell(y, \vs_1) r(y | \vs_1) d y
+\end{equation}
+が成り立つことを要請しておく．
+
+(\ref{eq:LLN2})式の仮定のもと，
+データ数 $n$ が大きいとき，$L_n(\vth)$ は
+\begin{equation}
+\label{eq:loss_infty}
+	 L_\infty(\vth) = \int \int \ell(y , \vvarphi(x; \vth)) 
+	 	r(y | \vvarphi_o(x)) u(x) dy dx
+\end{equation}
+の近似となる．従って，経験損失関数の最小化は，
+近似的に(\ref{eq:loss_infty})式を最小化する $\vth$ を探していることになる．
+
+損失関数の代表的な選び方として，統計学でよく用いられる{\em 最尤法}(maximum 
+likelihood method)がある．
+これは，損失関数として負の対数尤度関数 
+\begin{equation*}
+	\ell(y, \vs) = - \log r(y | \vs) 
+\end{equation*}
+を取る方法である．また，２乗誤差 $\ell(y, \vs) = \| y - \vs \|^2$ も
+よく用いられる．
+
+\ref{sec:stat_learning}節で紹介した２つの例に関して最尤法が
+どのような目的関数を与えるか調べて
+おこう．例１の加法的ガウスノイズの場合には，簡単な計算により
+\begin{equation*}
+	L_n(\vth) = \frac{1}{n} 
+		\sum_{i=1}^n \frac{1}{2\sigma^2}\| y_i - 
+		\vvarphi(x_i;\vth) \|^2  + 
+		\text{ 定数 }
+\end{equation*}
+となり，最小２乗誤差の規準と一致する．
+また例２の２クラス識別問題では，関数 $\varphi(x; \vth)$ のもとで
+$y=1$ となる確率を $p(x; \vth) = 
+1/(1+e^{- \varphi(x; \vth) })$ で表すとき，
+\begin{equation*}
+	L_n(\vth) = - \frac{1}{n} \sum_{i=1}^n \bigl\{ y_i 
+		\log p(x_i; \vth) + 
+	(1-y_i) \log ( 1- p(x_i; \vth) ) \bigr\}
+\end{equation*}
+が得られる．この目的関数をクロスエントロピーと呼ぶことがある．
+
+
+\subsection{学習機械の汎化能力}
+学習機械 $\vvarphi(x; \vth)$ に対して，その期待損失を
+\begin{equation}
+	K(\vth\,) = \int \int \ell(y , \vvarphi(x; \vth)) 
+		r(y | \vvarphi_o(x)) q(x) dy dx
+\end{equation}
+により定義する．$K(\vth)$ は，学習機械が
+定環境における入力分布 $Q$ から入力ベクトルを受け取ったときに，
+真のシステムの出力 $y$ を $\vvarphi(x; \vth)$ によって
+予測した場合の損失の平均値を表している．
+
+経験損失関数 $L_n(\vth)$ を最小にするパラメータを $\hvth$ として，
+その期待損失 $K(\hvth)$ を考えよう．これは有限個のデータによる学習から
+どれぐらい真の関数を忠実に再現できたかを
+示しており，得られた機械の{\bf 汎化誤差}（generalization error），もしくは
+{\bf 予測誤差}（prediction error）と呼ばれる．
+
+学習によって得られたパラメータ $\hvth$ は学習データの関数であるから，
+確率的なばらつきを持つ確率変数
+である．いま学習データの入力点 $X_n=\{ x_i\}_{i=1}^n$ 
+を固定して考え，$X_n$ を条件としたときの
+出力データ $Y_n = \{ y_i \}_{i=1}^n$ による汎化誤差の期待値
+\begin{equation}
+\label{eq:risk}
+R(X_n) = E_{Y_n}\bigl[ K(\hvth \,) | X_n \bigr]
+\end{equation}
+を考える．本章における能動学習の目的は $R(X_n)$ を最小にする $X_n$ を探すこと
+である．
+
+
+\section{能動学習の方法 -- 汎化誤差を最小にするデータ採取点}
+\label{sec:active_learning}
+\subsection{漸近理論による汎化誤差の期待値の推定}
+\label{sec:risk_expansion}
+汎化誤差の期待値(\ref{eq:risk})式は未知の関数 
+$\vvarphi_o(x)$ を用いて定義されているため，
+これを直接計算することはできず，
+何らかの方法により推定することが必要となる．
+
+汎化誤差を推定する方法には，大きく分けて，データ数 $n$ が大きいときの
+推定量の統計的性質を記述する統計的漸近理論を用いる方法や，
+学習データを学習に使うデータとテストデータに分けて検証を行うクロス・
+バリデーション（cross-validation, \cite{CV}）などのアプローチがある．
+クロス・バリデーションでは，推定量が陽に計算できる単純なモデルを除くと，
+実際に学習を行ってみないと汎化誤差の推定が
+行えないため，採取するデータ点に $R(X_n)$ がどう依存するかを
+事前に明示的な形で与えるのが難しい．
+そこで以下では漸近理論を用いた方法を考察していく．
+
+(\ref{eq:loss_infty})式の経験損失の極限 $L_\infty(\vth)$ を
+最小にするパラメータを $\vth_o$ とおく．
+このパラメータは，学習機械のなかで，
+学習データを与える入力分布 $U$ のもとで
+真の入出力関係 $\vvarphi_o(x)$ を最もよく近似する機械を与える．
+微分可能性などの適当な条件のもと，$\vth_o$ は
+\begin{equation}
+\label{eq:K_der}
+	\frac{\partial L_\infty(\vth_o)}{\partial \vth} = 0
+\end{equation}
+を満足する．
+真の入出力関係がもともと有している期待損失
+\[
+	\int \int \ell(y, \vvarphi_o(x)) r(y | \vvarphi_o(x)) q(x) 
+		dy d x
+\]
+を $K_*$ で表すことにすると，(\ref{eq:risk})式は
+以下のように分解される．
+\begin{equation}
+\label{eq:risk_decomp}
+	R(X_n) = K_* + \{ K(\vth_o)-K_* \} + E_{Y_n} 
+		[ K(\hvth) - K(\vth_o) ].
+\end{equation}
+右辺第１項はシステムは学習機械や
+学習データには依存しない．第２項は，入力分布 $U$ のもとで，最適
+な関数が真の入出力関係からどれぐらいずれているかを表している．
+学習データのばらつきに依存するのは第３項のみ
+であり，データから推定された機械が最もよい機械からどれほどばらつくか
+を表している（図\ref{fig:decomp})．
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%   \epsfysize=4cm
+%   \epsfbox{ps/decomp.eps}
+% \caption{汎化誤差の分解}
+% \label{fig:decomp}
+% \end{center}
+% \end{figure}
+
+いま，システム設計者が学習機械として十分に表現能力の高い関数族を
+設定したと仮定し，第３項に比べて第２項が無視できるほど小さい場合を
+考察の対象としてみよう．
+そこで理論的な単純化として，真の入出力関係が $\vth_o$ で与えられる，すなわち
+\begin{equation}
+\label{eq:bias_free}
+	\vvarphi(x; \vth_o) = \vvarphi_o(x)
+\end{equation}
+を仮定する．このとき(\ref{eq:risk_decomp})式の第２項は，
+(\ref{eq:loss_assump})式の仮定より，最小値である0をとる．
+さらに\ref{sec:active_learning}節では，任意の $x$ に対し
+\begin{equation}
+\label{eq:no_bias}
+\parder{}{\vth} \int \ell(y, \vvarphi(x; \vth)) 
+r(y | \vvarphi_o(x)) dy |_{\vth=\vth_o} = 0
+\end{equation}
+が成り立つことを仮定する．
+%微分との積分の交換が成り立つとき
+%(\ref{eq:no_bias})式は(\ref{eq:K_der})式を導く．
+簡単な計算により，損失関数 $\ell(y, \vs)$ が 負の対数尤度 $- \log r(y | 
+\vs)$ であれば(\ref{eq:no_bias})式が成り立つことがわかる．また，条件付
+密度関数 $r(y| 
+\vs)$ において $\vs$ が $y$ の平均値を表しており
+（$\int y r(y, \vs) dy = \vs $ ），かつ損失関数が２乗
+誤差 $\ell(y,\vs) = \| y - \vs \|^2$ であるならば，やはり
+(\ref{eq:no_bias})式を満足する．
+
+(\ref{eq:bias_free})式の仮定のもと，汎化誤差の期待値は
+\begin{equation*}
+	R(X_n) = K_* + E_{Y_n}[ K(\hvth) - K(\vth_o) ] 
+\end{equation*}
+となるが，これを $\vth_o$ のまわりで $\hvth$ に関して Taylor 展開
+すると
+\begin{equation}
+\label{eq:risk_expansion}
+	R(X_n) = K_* + \frac{1}{2} \sum_{a,b=1}^{d} 
+	\frac{\partial^2 K(\vth_o) }{\partial \theta^a \partial\theta^b}
+	E_{Y_n}
+		[(\hat{\theta}^a - \theta_o^a)(\hat{\theta}^b - \theta_o^b) ]
+		+ O(E_{Y_n}\| \hvth - \vth_o \|^3 ) 
+\end{equation}
+が得られる．ここで(\ref{eq:no_bias})式を用いた．
+
+$n\to \infty$ の時に 
+$E_{Y_n}[ (\hat{\theta}^a - \theta_o^a)
+(\hat{\theta}^b - \theta_o^b) ]$ が収束する値を
+漸近理論（\cite{Lehmann}, Section 6）により知ることができる．
+半正定値行列 $G(\vth; x)$, $H(\vth; x)$ を
+\begin{align*}
+	G(\vth; x)_{ab} & = \int 
+		\parder{\ell(y , \vvarphi(x;\vth))}{\theta^a}
+		\parder{\ell(y , \vvarphi(x;\vth))}{\theta^b}
+		r(y | \vvarphi(x ; \vth))  dy
+	\nonumber \\
+	H(\vth; x)_{ab} & = \int 
+		\frac{\partial^2 \ell(y , \vvarphi(x; \vth))}
+		{\partial \theta^a \partial \theta^b}
+		r(y | \vvarphi(x ; \vth)) dy
+\end{align*}
+により定義し，入力データ $X_n$ に対する情報行列 $G_n(\vth;X_n)$, 
+$H_n(\vth;X_n)$ を
+\begin{equation}
+\label{eq:def_GH}
+	G_{n}(\vth;X_n) = \frac{1}{n}\sum_{i=1}^n 
+		G(\vth; x_i), \qquad 
+	H_{n}(\vth;X_n)  =  \frac{1}{n}\sum_{i=1}^n 
+		H(\vth; x_i)
+\end{equation}
+により定める．$G_n(\vth_o;X_n)$ は正定値であると仮定し，
+情報行列 $J_n(\vth_o; X_n)$ を
+\begin{equation*}
+	J_n(\vth_o; X_n) = H_n(\vth_o;X_n) G_n^{-1}(\vth_o;X_n) H_n(\vth_o;X_n)
+\end{equation*}
+により定義する．(\ref{eq:LLN})式の仮定により，
+$n\to\infty$ における $G_n(\vth_o;X_n)$, 
+$H_n(\vth_o;X_n)$ の極限をそれぞれ $G(\vth_o)$, $H(\vth_o)$ とおくと，
+$J_n(\vth_o; X_n)$ は $n \to \infty$ のとき
+\begin{equation*}
+	 J_n(\vth_o; X_n) \to J(\vth_o) = H(\vth_o) G^{-1}(\vth)H(\vth_o)
+\end{equation*}
+と収束する．このとき，適当な正則条件のもとで，
+\begin{equation*}
+	n E_{Y_n}[ (\hvth - \vth_o)(\hvth - \vth_o)^T] 
+	\quad \longrightarrow\quad J^{-1}(\vth_o)
+\end{equation*}
+と収束することが示される．
+さらに対称行列 $F(\vth)$ を
+\begin{equation*}
+	F_{ab}(\vth) = \frac{\partial^2 K(\vth)}
+	{\partial \theta^a \partial \theta^b} = \int H(\vth_o; x)_{ab}
+	 q(x)dx
+\end{equation*}
+により定義すると，データ数 $n$ が大きいとき，(\ref{eq:risk_expansion})式より
+\begin{equation*}
+	R(X_n) = K_* + \frac{1}{2n} \trace \bigl[ F(\vth_o) J^{-1}
+	(\vth_o) \bigr] + o_p(\tfrac{1}{n})
+\end{equation*}
+となるので，$X_n$ を用いて
+\begin{equation}
+\label{eq:risk_approx}
+R(X_n) \approx K_* + \frac{1}{2n} \trace \bigl[ F(\vth_o) J_n^{-1}
+	(\vth_o; X_n) \bigr] 
+\end{equation}
+と近似できる．
+以上により，汎化誤差の期待値を最小にする能動学習の規準
+\begin{equation}
+\label{eq:Tr_crit}
+	\trace \bigl[ F(\vth_o) J_n^{-1}(\vth_o; X_n) \bigr] 
+\end{equation}
+が得られた．
+
+システムが置かれる環境から与えられたデータを学習に使う場合，
+$X_n$ は $Q$ からの独立なサンプルである．このような学習は
+能動学習に対して{\em 受動学習}と呼ばれる．能動学習を
+行うことにより，受動学習よりも汎化誤差を小さくすることが期待される．
+大数の法則により，受動学習の場合には，
+$G(\vth_o) = E_Q[ G(\vth_o; x) ]$, $H(\vth_o) = E_Q[ H(\vth_o; x)]$ 
+となる．特に
+$\ell(y, \vs) = - \log r(y | \vs)$ の場合には，
+$
+	\int \parder{r(y | \vs) }{\vs} dy = 0
+$, 	
+$\int \frac{\partial^2 r(y | \vs) }{\partial\vs 
+	\partial \vs} dy = 0
+$
+を用いることにより，
+\begin{equation*}
+	G(\vth;x) = H(\vth;x)
+\end{equation*}
+が得られるので，$J(\vth) = F(\vth) = G(\vth) = H(\vth)$ が成り立つ．
+すると，パラメータ $\vth$ の次元を
+$d$ とするとき
+\begin{equation*}
+	R(X_n) \approx K_* + \frac{d}{2n}
+\end{equation*}
+となることがわかる．能動学習の効果の理論値は，
+$\trace[ F(\vth_o) J_n(\vth_o; X_n)^{-1}]$ 
+が $d$ よりどれだけ小さくなるかによって決定される．
+
+能動学習の規準(\ref{eq:Tr_crit})式は，未知パラメータ $\vth_o$，言い換えれば
+真の関数 $\vvarphi_o(x)$ に依存している．
+そこで，これを推定量 $\hvth$ で
+置き換える必要が生じるのであるが，それは後に回し，手始めに
+(\ref{eq:Tr_crit})式が $\vth_o$ に依存しない場合を考察してみよう．
+これは関数族 $\vvarphi(x; \vth)$ が $\vth$ に関して
+線形の場合である．
+
+\subsection{汎化誤差を小さくする能動学習 -- 線形の場合 --}
+\label{sec:asymp_al}
+ここでは簡単のため出力次元 $M$ が 1 の場合に話を限る．
+学習機械が，$K$個の固定された関数 $\psi_k(x)$ とパラメータ 
+$v_k$ ($1 \leq k \leq K$) とを用いて，
+\begin{equation*}
+	\varphi(x; \vv) = \sum_{k=1}^K v_k \psi_k(x) = \vv^T \vpsi(x) 
+\end{equation*}
+（$\vv = (v_1,\ldots,v_K)^T$, 
+$\vpsi(x) = (\psi_1(x), \ldots, \psi_K(x))^T$ ）
+という線形の関数族で定義されているとする．
+さらに，損失関数は２乗誤差 $\ell(y; s) = \frac{1}{2}\| y - s \|^2$ 
+であり，条件付き確率密度 $r(y | s) $ は平均0分散$\sigma^2$のある
+確率密度関数 $g(s)$ を用いて
+$
+	r(y | s ) = g(y - s)
+$
+と表すことができると仮定する．このとき簡単な計算により，
+\begin{equation*}
+	F(\vth_o) = E_Q[\vpsi(x)\vpsi(x)^T], \qquad 
+	J_n(\vth_o; X_n) = \tfrac{1}{\sigma^2} \tilde{J}_n(X_n) = 
+	\tfrac{1}{\sigma^2} \overline{\vpsi(x)\vpsi(x)^T}
+\end{equation*}
+となり，これらは $\vth_o$ に依存しないことがわかる．
+ここで，$\tilde{J}_n(X_n)$ は
+\begin{equation*}
+	\tilde{J}_n(X_n) = \overline{\vpsi(x)\vpsi(x)^T} = \frac{1}{n} 
+	\sum_{i=1}^n \vpsi(x_i)\vpsi(x_i)^T
+\end{equation*}
+で定義される，学習データの入力点の標本相関行列であり，
+デザイン行列と呼ばれることもある．
+さらに，以上の仮定のもとでは，(\ref{eq:risk_approx})式は，$n\to\infty$ 
+における近似ではなく，$R(X_n)$ を厳密に与える式であることが
+簡単な計算によりわかる．
+
+(\ref{eq:Tr_crit})式は $X_n$ のみの関数であり，
+学習を行う以前に最適化を行うことが可能である．実際，入力分布 $Q$ が
+特殊な場合に，多項式などいくつかの関数系に関して
+最適なデータ採取点が知られている(\cite{Fedorov}, Section 2.3, 2.4)．
+以下に三角関数の場合の最適データ採取点を示しておこう．
+
+入力の空間として
+閉区間 $[0, 2\pi]$ を考え，自然数 $H$ と $K = 2H+1$ に
+対して，三角関数系
+\begin{equation*}
+	\psi_1(x) =  1,	\quad 
+	\psi_{2j}(x) =  \sqrt{2} \cos(jx), \quad 
+	\psi_{2j+1}(x) =  \sqrt{2} \sin(jx), \quad ( 1\leq j \leq H)
+\end{equation*}
+を設定する．入力空間上の分布 $Q$ として区間 $[0,2\pi]$ 上の一様分布を
+定めると，$\{ \psi_k(x) \mid k=1, \ldots, K\}$ が
+$L^2(Q)$ の正規直交系となることは容易にわかる．
+すると，$F(\vth) = I_K$ （$K$次単位行列）であり，汎化誤差最小の学習データは
+\begin{equation}
+\label{eq:A_opt}
+	\trace [ \tilde{J}_n(X_n)^{-1} ]
+\end{equation}
+を最小にする入力点で取ればよいことがわかる．
+実は次の定理が示すように，等間隔に取った $X_n$ がこの条件を満たしている．
+\begin{thm}
+(\ref{eq:A_opt})式が最小となるのは $\tilde{J}_n = I_K$ の場合である．
+また，$n \geq K$ のとき，入力点
+\begin{equation*}
+	x_i =  \frac{i-1}{n} 2\pi,\qquad i=1, \ldots, n
+\end{equation*}
+はこの条件を満足する．
+\end{thm}
+
+% \begin{proof}
+% 後半の主張は容易に調べられるので，前半だけ示す．
+% 任意の $x$ に対し
+% \begin{equation*}
+% %\label{eq:tri_diag_K}
+% 	\sum_{k=1}^K \varphi_k(x)^2 = 1 + \sum_{j=1}^H 
+% 		\bigl(2\cos^2 (jx) + 2\sin^2 (jx) \bigr) = K
+% \end{equation*}
+% であることに注意すると，
+% 任意の $X_n = \{ x_i \}_{i=1}^n$ に対し，
+% \begin{equation}
+% 	\frac{d}{dt} \trace[ 
+% 		\{ t \tilde{J}_n(X_n) + (1-t)I_K  \}^{-1} ] \bigl|_{t=0}
+% 	= \trace[ - I_K^{-1} \{ \tilde{J}_n(X_n) - I_K \} I_K^{-1} ] = 0
+% \label{eq:der_of_tr}
+% \end{equation}
+% が成立する．
+% いま(\ref{eq:A_opt})式を最小にする $\tilde{J}_n$ を $\tilde{J}_n^*$ 
+% とかくことにし，$t \in [0,1]$ に対して，
+% \[
+% 	J(t) = t \tilde{J}_n^* + (1-t) I_K
+% \]
+% とおく．一般に正定値対称行列 $A$, $B$ に関して 
+% $
+% (sA + (1-s)B)^{-1} \leq s A^{-1} + (1-s) B^{-1}$ が成り立つので，
+% $\trace[ J(t)^{-1} ] $ は $t$ に関する凸関数である．すると，もしある
+% $t \in (0,1]$ に対して 
+% $\trace[J(t)^{-1}] < \trace[ I_k^{-1}] $ であるならば，
+% $
+% 	\frac{d}{dt} \trace[ J(t)^{-1} ] |_{t=0} < 0
+% $
+% となり(\ref{eq:der_of_tr})式に矛盾する．したがって任意の $t \in [0,1]$ 
+% に対して 
+% $\trace[J(t)^{-1}] = \trace[\tilde{J}_n^{*-1}] = \trace[I_K] = K$ が成り立つ．
+% ところがこれは，
+% $t \tilde{J}_n^{*-1} + (1-t) I_K^{-1} - J(t)^{-1} \geq 0$ において，左辺のトレースが
+% 0であることを意味し，$J(t)^{-1} = t \tilde{J}_n^{*-1} + (1-t) I_K^{-1}
+% $ を得る．対角化すればあきらかなように，$\tilde{J}_n^* = I_K$ でなければならない．
+% \end{proof}in{proof}
+% 後半の主張は容易に調べられるので，前半だけ示す．
+% 任意の $x$ に対し
+% \begin{equation*}
+% %\label{eq:tri_diag_K}
+% 	\sum_{k=1}^K \varphi_k(x)^2 = 1 + \sum_{j=1}^H 
+% 		\bigl(2\cos^2 (jx) + 2\sin^2 (jx) \bigr) = K
+% \end{equation*}
+% であることに注意すると，
+% 任意の $X_n = \{ x_i \}_{i=1}^n$ に対し，
+% \begin{equation}
+% 	\frac{d}{dt} \trace[ 
+% 		\{ t \tilde{J}_n(X_n) + (1-t)I_K  \}^{-1} ] \bigl|_{t=0}
+% 	= \trace[ - I_K^{-1} \{ \tilde{J}_n(X_n) - I_K \} I_K^{-1} ] = 0
+% \label{eq:der_of_tr}
+% \end{equation}
+% が成立する．
+% いま(\ref{eq:A_opt})式を最小にする $\tilde{J}_n$ を $\tilde{J}_n^*$ 
+% とかくことにし，$t \in [0,1]$ に対して，
+% \[
+% 	J(t) = t \tilde{J}_n^* + (1-t) I_K
+% \]
+% とおく．一般に正定値対称行列 $A$, $B$ に関して 
+% $
+% (sA + (1-s)B)^{-1} \leq s A^{-1} + (1-s) B^{-1}$ が成り立つので，
+% $\trace[ J(t)^{-1} ] $ は $t$ に関する凸関数である．すると，もしある
+% $t \in (0,1]$ に対して 
+% $\trace[J(t)^{-1}] < \trace[ I_k^{-1}] $ であるならば，
+% $
+% 	\frac{d}{dt} \trace[ J(t)^{-1} ] |_{t=0} < 0
+% $
+% となり(\ref{eq:der_of_tr})式に矛盾する．したがって任意の $t \in [0,1]$ 
+% に対して 
+% $\trace[J(t)^{-1}] = \trace[\tilde{J}_n^{*-1}] = \trace[I_K] = K$ が成り立つ．
+% ところがこれは，
+% $t \tilde{J}_n^{*-1} + (1-t) I_K^{-1} - J(t)^{-1} \geq 0$ において，左辺のトレースが
+% 0であることを意味し，$J(t)^{-1} = t \tilde{J}_n^{*-1} + (1-t) I_K^{-1}
+% $ を得る．対角化すればあきらかなように，$\tilde{J}_n^* = I_K$ でなければならない．
+% \end{proof}
+
+
+\subsection{汎化誤差を小さくする能動学習 -- 一般の場合 --}
+\ref{sec:asymp_al}節で見た線形の場合とは異なり，
+一般には能動学習の規準式(\ref{eq:Tr_crit})
+は未知パラメータ $\vth_o$ に依存している．
+そこで，これを推定量 $\hvth$ で置き換え，
+\begin{equation}
+\label{eq:Tr_crit_est}
+	\trace[ F(\hvth) J_n(\hvth; X_n)^{-1} ] 
+\end{equation}
+を考えるとよい．しかしながら，推定量 $\hvth$ はデータを決めないと
+計算できないので，比較的少数の学習データによって求められた推定量から
+出発し，新たな学習データ採取点の最適化と推定量の更新とを
+交互に行っていくシーケンシャルな学習が自然と必要になる
+（図\ref{fig:sequential}）．
+
+これをまとめると以下のような能動学習の手順が構成できる．
+
+\medskip
+\noindent
+{\bf [シーケンシャルな能動学習]}
+\newcounter{determ}
+\begin{list} 
+{{\bf \arabic{determ}}.}{\usecounter{determ}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{25pt}}
+\item 初期学習データ $D_{N_0}$ を用意する． 
+\item $D_{N_0}$ を用いて初期推定量 $\hvth_{N_0}$ を計算する．
+\item $n := N_0 + 1$ とおく．
+\item $X_n = X_{n-1} \cup \{ x^{(n)}\}$ として，
+次式を最小にする $x^{(n)}$ を算出する．
+\begin{equation}
+\label{eq:seq_crit}
+\text{Tr} \left[ F(\hvth_{n-1})  J_n(\hvth_{n-1}; X_{n})^{-1} \right] 
+\end{equation}
+\item システムに $x^{(n)}$ を入力し，それに対する出力 $y^{(n)}$ を観測する．  
+\item 学習データを $D_n := D_{n-1} \cup \{(x^{(n)}, y^{(n)})\}$ により更新する．
+\item 学習データ $D_n$ を用いて推定量 $\hvth_n$ を計算する．
+\item $n := n+1$ とおく． 
+\item $n > N$ ならば終了．そうでないならば{\bf 4}へ行く． 
+\end{list}
+\medskip
+\noindent
+ここではデータ点を１個ずつ取るような方法を述べたが，一度に複数個の
+データ点をとるようにしてもよい．
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 3.5cm
+%   \epsfbox{ps/sequential.eps}
+%   \caption{シーケンシャルな能動学習}
+% \label{fig:sequential}
+% \end{center}
+% \end{figure}
+
+
+
+さて，ここで述べたシーケンシャルな能動学習は最も基本的なものであるが，
+応用される問題や使われる関数系によってはいくつかの問題点も含んでいる．
+まず第１の問題は，パラメータ学習の困難さに関する点である．
+非線形な関数系を学習機械に用いた場合には，パラメータ $\vth$ の最適化
+に最急降下法や Newton 法といった非線形最適化手法を用いることになる．
+一方，能動学習により得られる学習データは，
+最適パラメータが正確に求められれば
+汎化誤差の期待値を最小にするが，逆に経験損失関数の形状を複雑にしてしまい，
+パラメータ $\vth$ の最適化を困難にする可能性がある．
+実際，汎化誤差最小の規準による最適データ採取点を求めることにより，
+同じ点が繰り返し選ばれ，
+パラメータの最適化が困難になる例が，
+Fukumizu (\cite{fuku_al_ieee})に示されている．
+
+最適な入力点が同じような点を選ぶ現象は，理論的には次のように理解する
+ことが出来る．規準式(\ref{eq:Tr_crit})は，
+対称行列 $G_n(\vth_o; X_n)$ と $H_n(\vth_o; X_n)$ の
+関数と見なせる．これらは合わせて $d(d-1)$ 次元のベクトルであるが，
+(\ref{eq:def_GH})式からわかるように，任意のベクトルが
+集合 $\Delta = \{ (G(\vth_o; x), H(\vth_o; x)) \mid x \in X_n \}$ 
+の点の凸結合として表現できる．付録で述べた Carath\'{e}odory の定理に
+従うと，これは高々 $d(d-1)+1$ 
+個の点の凸結合として表現できる．従って，もし最適な
+データ採取点が存在すれば，それらは高々 $d(d-1)+1$ 個の点をある割合で
+繰り返し取ることにより近似できる．この結果として，バリエーションの
+少ない入力点が選ばれる可能性が生じる．
+
+第２の問題点は，最適化に伴う計算コストの問題である．
+非線形関数を学習機械として用いる場合には，機械のパラメータ $\vth$ を
+数値的最適化により求める必要があるが，それに加えて新たなデータ採取点
+も数値的最適化で求めなくてはならない．シーケンシャルな能動学習においては，
+これをデータ採取ごとに繰り返し行うので，情報行列に対する多くの演算を必要とし
+計算コストは非常に高くなる．
+
+以上のような問題点に対処するための工夫のひとつとして，以下では
+確率的な能動学習について述べる．
+
+
+\subsection{確率的な能動学習}
+\label{sec:prob_al}
+前節で述べた問題から，(\ref{eq:Tr_crit})式の規準を厳密に
+最小化するのではなく，確率的にばらつきを残した入力点を
+選ぶ方法が考えられている．Fukumizu (\cite{fuku_al_ieee})で提案されている
+多点探索を用いた方法を以下に述べる．この方法は，特に学習の初期段階での
+パラメータ最適化の失敗を防ぐため，
+学習の初期においては得られるデータ採取点のばらつき
+を大きくし，徐々に真に最適な採取点が見つかりやすくする．
+以下で $T_n$ は $n$ に関して単調増加な自然数列である．
+
+\medskip
+\noindent
+{\bf [確率的な能動学習（多点探索による方法）]}
+\newcounter{multi}
+\begin{list} 
+{{\bf \arabic{multi}}.}{\usecounter{multi}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{25pt}}
+\item 初期学習データ $D_{N_0}$ を用意する． 
+\item $D_{N_0}$ を用いて初期推定量 $\hvth_{N_0}$ を計算する．
+\item $n := N_0 + 1$ とおく．
+\item $T_n$ 個の候補点 $x_{<1>}, \ldots, x_{<T_n>}$ を発生させる．
+\item 
+次式の最小化問題の解 $x_{<j>}$ を新しい入力点 $x^{(n)}$ とする．
+\[
+\min_{j=1,\ldots,T_n} 
+\text{Tr} \left[ F(\hvth_{n-1})  J_n(\hvth_{n-1}; X_{n-1}\cup 
+	\{ x_{<j>} \})^{-1} \right] 
+\]      
+\item システムに $x^{(n)}$ を入力し，それに対する出力 $y^{(n)}$ を観測する．  
+\item 学習データを $D_n := D_{n-1} \cup \{(x^{(n)}, y^{(n)})\}$ 
+により更新する． 
+\item 学習データ $D_n$ を用いて推定量 $\hvth_n$ を計算する．
+\item $n := n+1$ とおく． 
+\item $n > N$ ならば終了．そうでないならば{\bf 4}へ行く． 
+\end{list}
+\medskip
+
+もし候補点を入力分布 $Q$ から発生させたとすると，この学習は初期においては
+受動的学習に近い学習を行ない徐々に最適に近いデータを採取していくことに
+なる．これにより，実際に学習データ採取点のばらつきが大きくなることが
+実験的にも確認されている（Fukumizu \cite{fuku_al_ieee})．
+また，この方法は計算コストの点でも利点が大きい．
+一般には，(\ref{eq:seq_crit})式の最適化には数値的な非線形最適化
+の手法を用いる必要があるが，上の多点探索を用いるとその必要はない．
+
+ばらつきを残した能動学習と考えられる他の例として，
+Cohn(\cite{CohnAL})の提案した方法がある．この方法は，
+(\ref{eq:seq_crit})式の情報行列の計算を省略するために，
+定環境下での入力分布 $Q$ に従う参照点 $x_r$ を
+データ点選択時ごとにひとつ取り，$F(\vth)$ のかわりに $H(\vth; x_r)$ を
+用いて
+\begin{equation*}
+	\min_{x^{(n)}} 
+		\trace[ H(\widehat{\vth}_{n-1}; x_r) J_n(\widehat{\vth}_{n-1}; 
+		X_{n-1}\cup \{ x^{(n)} \} )^{-1} ]
+\end{equation*}
+を達成する $x^{(n)}$ を次の入力点として選択するものである．
+これは本来 $F(\widehat{\vth})$ の積分計算を省略することを目的として
+提案された手法であるが，
+$Q$ からの参照点を取ることにより，データ採取点にバリエーション
+を持たせる働きもあると考えられる．
+
+
+
+\subsection{その他の規準による最適データ採取点探索}
+\label{sec:other_crit}
+今まで汎化誤差最小を規準とした能動学習を述べてきたが，
+汎化誤差を定義するためには，
+実環境下における
+入力分布 $Q$ が必要であった．
+しかしながら，この分布を学習時に知ることが
+できない場合もあるため，汎化誤差とは異なる規準を考えることも
+重要である．
+統計学の最適実験計画や，Response Surface Methodology 
+(\cite{res_surf},\cite{res_surf2})と
+呼ばれる回帰分析の方法論においては，さまざまな規準による
+データ採取点の最適化が研究されてきた．
+ここではその中で，主に最適実験計画で議論されてきた 
+Minmax 規準，D-optimality，A-optimality などを紹介する．
+
+本節では，以下の仮定のもとで問題を考えることにする．
+\begin{enumerate}
+\item 真の入出力関係は設定したモデルに含まれており，
+$\vvarphi(x; \vth_o) = \vvarphi(x)$ を満たす．
+\item 
+(\ref{eq:no_bias})式が成立する．すなわち，任意の $x$ について
+\[
+	\parder{}{\vth} \int\ell(y ,\vvarphi(x; \vth_o)) 
+		r(y | \vvarphi_o(x)) dy = 0.
+\]
+\item 
+ある正数 $c$ があって 
+$H(\vth_o; x) = c G(\vth_o; x)$ が成り立つ．
+\end{enumerate}
+上の仮定のうち，2, 3 は，次の (A), (B) のうちどちらか一方が満足されれば
+成立する．
+
+\medskip
+\noindent
+(A) 損失関数が負の対数尤度：　$\ell (y, \vs) = - \log r(y | \vs)$ \\
+(B) 損失関数が２乗誤差 $\ell(y, \vs) = \frac{1}{2} \| y - \vs \|^2$ で，
+$r(y|\vs)$ は，平均0分散共分散行列 $\sigma^2 I_M$ なる確率密度関数 
+$g(\vs)$ を用いて $r(y | \vs ) = g(y - \vs) $ と書ける． 
+
+\medskip
+\noindent
+この事実をチェックするのはそれほど難しくないので，ここでは省略するが，
+上の(A),(B)は特によく用いられる重要なケースである．
+
+
+\bigskip
+\noindent
+{\bf Minmax }{\em 規準}\\
+経験損失最小によって
+得られた学習機械 $\vvarphi(x;\hvth)$ に対して，
+各 $x$ における推定の誤差を表す量として
+\begin{multline*}
+	 d(x; X_n)	 = E_{Y_n}\Bigl[
+	\int \ell(y, \vvarphi(x; \hvth) ) r(y | \vvarphi(x; \vth_o)) 
+	dy \Bigr] \\ - \int \ell(y, \vvarphi(x; \vth_o) ) 
+	r(y | \vvarphi(x; \vth_o)) dy
+\end{multline*}
+を考える．上記(B)のケースでは，$d(x; X_n)$ は定数倍を除いて 
+点 $x$ における誤差分散の期待値 $ E_{Y_n}\bigl[ 
+\| \vvarphi(x;  \hvth)- \vvarphi(x; \vth_o) \|^2 \bigr]$ に一致する．
+{\bf Minmax }{\em 規準}とは，学習データの入力点 $X_n$ を
+\begin{equation}
+\label{eq:minmax}
+	\min_{X_n} \max_{x}  d(x; X_n) 
+\end{equation}
+という minmax 問題の解として求めるものである．すなわち，最悪の誤差をなるべく
+小さくしようとする学習データ設計法である．
+
+(\ref{eq:minmax})式の形では
+右辺が $X_n$ にどのように依存しているかわかりにくいので，
+漸近展開ないしは線形近似を行ってみよう．
+(\ref{eq:no_bias})式を用いると，Taylor展開により
+\[
+d(x; X_n) \approx \frac{1}{2} \sum_{a,b=1}^d 
+	H(\vth_o; x)_{ab}
+	E_{Y_n}[ (\widehat{\theta}^a - \theta_o^a)
+	(\widehat{\theta}^b - \theta_o^b)]
+\]
+となるが，\ref{sec:risk_expansion}節でも述べたように，仮定の2，3のもとでは，
+$n$ が大きいとき 
+\[
+	E_{Y_n}[ (\hvth - \vth_o)(\hvth - \vth_o)^T] \approx 
+	\tfrac{1}{n} J_n(\vth_o)^{-1} = \tfrac{1}{cn} H_n(\vth_o; X_n)^{-1} 
+\]
+と近似できる．したがって，
+\begin{equation}
+	d(x; X_n) \approx \frac{1}{2nc} \trace [ 
+		H(\vth_o; x ) H_n(\vth_o; X_n)^{-1} ]
+\end{equation}
+である．そこで，線形化された minmax 規準として，
+\begin{equation}
+\label{eq:lin_d}
+\tilde{d}(x; X_n) = \trace[ H( \vth_o;x) H_n(\vth_o; X_n)^{-1} ]
+\end{equation}
+に対して
+\begin{equation}
+\label{eq:minmax_r}
+	\min_{X_n} \max_{x} \tilde{d}(x; X_n)
+\end{equation}
+を考えることができる．
+(\ref{eq:minmax_r})式は未知パラメータ $\vth_o$ 
+を含んでいるが，汎化誤差最小規準と同様，シーケンシャルな学習の規準として
+利用できる．また $\vth_o$ に依存しない線形の場合には一度に
+$X_n$ の最適化が可能である．
+
+\bigskip
+\noindent
+{\bf D-optimality}\\
+情報行列 $J_n$ が大きいことが推定精度を上げると考えられるので，
+情報行列の行列式の大きさを能動学習の規準として採用することに
+して，
+\begin{equation}
+\label{eq:D_opt}
+	\det J_n(\vth_o; X_n)
+\end{equation}
+を最大にする入力点を考える．このような規準を {\bf D-optimality} と
+呼ぶ．
+
+
+\bigskip
+\noindent
+{\bf A-optimality}
+\begin{equation}
+	\trace [ J_n(\vth_o; X_n)^{-1} ]
+\end{equation}
+を最小にする規準を {\bf A-optimality} と呼ぶ．
+これは，漸近的にはパラメータの平均2乗誤差 $\frac{1}{m} 
+\sum_{a=1}^m E_{Y_n} [ ( \hat{\theta}^a - \theta^a_o )^2 ] $ を最小にするような
+規準と考えることができる．
+
+
+\bigskip
+\noindent
+{\bf 誤差分散に基づく逐次的 $D$-optimality}\\
+D-optimality において，ケース(B)の場合を
+考える．このとき，$J_n(\vth_o;X_n) = c H_n(\vth_o; X_n)$ であるから，
+$\det H_n(\vth_o; X_n)$ を最大化すればよいが，これを逐次的に実行する
+ことを考える．
+
+以降簡単のため，情報行列 $H_n(\vth_o; X_n)$ を
+$H_n$ と略する．すると，
+\begin{equation*}
+	H(\vth_o; x) = \parder{\vvarphi(x; \vth_o)}{\vth}^T
+	\parder{\vvarphi(x; \vth_o)}{\vth}
+\end{equation*}
+（$\parder{\vvarphi(x; \vth_o)}{\vth}$ は $M \times d$ 
+行列としている）であるから，
+$H_{n+1}$ は $H_n$ を用いて，
+\begin{equation*}
+	H_{n+1} = \tfrac{n}{n+1} \Bigl( 
+	H_n + \frac{1}{n}  
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth}^T
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth}  \Bigr)
+\end{equation*}
+と書くことができる．したがって，付録の補題\ref{lma:det}より
+\begin{equation*}
+	\det H_{n+1} = \bigl( \tfrac{n}{n+1} \bigr)^d 
+	\det H_n \det 
+	\Bigl( I_M + \frac{1}{n} 
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth} H_n^{-1}
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth}^T \Bigr) 
+\end{equation*}
+を得る．$X_n$ が既に決まっているときに
+$\det H_{n+1}$ を最大化するには，
+\begin{equation}
+\label{eq:det_trans}
+	\det 
+	\Bigl( I_M + \frac{1}{n} 
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth} H_n^{-1}
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth}^T \Bigr) 
+\end{equation}
+を最大にする $x^{(n+1)}$ を選択すればよい．
+出力次元 $M$ が１の場合には，これは $\tilde{d}(x; X_n)$ を最大にする点を
+データ採取点にすることを意味している．出力が多次元でも，$n$ が
+十分大きいときに任意の行列 $B$ に対して
+\[
+	\trace[\tfrac{1}{n} B ] = 
+	\log \det \exp\bigl( \tfrac{1}{n} B \bigr) 
+	 \approx \log \det [ I_M + \tfrac{1}{n} B] 
+\]
+という近似が成り立つことに注意すると，(\ref{eq:det_trans})式の $\log$ は
+\begin{equation*}
+\trace\Bigl[ \frac{1}{n} 
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth} H_n^{-1}
+	\parder{\vvarphi(x^{(n+1)}; \vth_o)}{\vth}^T   \Bigr]
+	= \frac{1}{n} \tilde{d}(x^{(n+1)}; X_n)
+\end{equation*}
+により近似される．
+以上により，誤差分散の期待値が最も大きくなる点を次のデータ採取点と
+していけば，近似的にその都度 $\det J_n(\vth_o; X_n \cup \{x^{(n+1)}\})$ 
+を最大にするように $x^{(n+1)}$ を
+採取していることになる．Fedorov (\cite{Fedorov}, Section 2.5, 4.2)には，
+$M = 1$ の場合に，この手続きによって得られるデータ点が，$n\to \infty$ の
+とき D-optimal であることが示されている．
+
+誤差分散 $d(x; X_n)$ を推定するためには，ブートストラップ法(\cite{Bootstrap})
+を用いることが可能である．Kindermann ら (\cite{Paass_95})は，ここで
+述べた誤差分散をブートストラップ法で推定し，それを最大にする点を探索
+する能動学習法を提案している．
+
+ここでは逐次的に誤差分散を小さくするデータ点が D-optimality と関連する
+場合を議論したが，実は D-optimality と
+$\tilde{d}(x; X_n)$ のminmax規準にはさらに密接な関係がある．
+それは，比較的弱い条件下で，D-optimality と minmax 規準により与えられる
+データ点が完全に一致するという，Kiefer-Wolfovitz の同値性定理である．
+これについては省略するが，文献\cite{KW_equiv}に初等的で明快な証明があるので，
+詳しくはそれを参照して欲しい．
+
+
+\section{能動学習とモデル選択}
+\label{sec:model_selec}
+ここまで能動学習の規準を導く際には，学習機械として十分に能力の高い関数族を
+設定し，真の入出力関係が学習機械によって実現可能であると仮定した．
+現実にはこのような仮定が成り立つとは限らないが，実は
+今まで述べた能動学習
+が効果を発揮するには，この仮定は非常に本質的である．本節では
+この仮定が能動学習に及ぼす影響を説明し，能動学習を効果的に働かせるための
+モデル選択について述べる．
+
+\subsection{不適合なモデルのもとでの能動学習の悪影響}
+\label{sec:mismatch}
+設定したモデルに真の入出力関係が含まれていない場合に
+能動学習がどのような結果をもたらすかを簡単な例によって
+考察する．
+区間 $[-1,1]$ 上の関数を学習する問題を考え，１次関数の族 ${\cal F} = \{ 
+a x + b \mid a,b \in \R, x \in [0,1] \}$ を学習機械として設定する．
+結果を評価するための入力分布 $Q$ は $[-1,1]$ 上の一様分布とし，
+損失関数は２乗誤差 $\ell(y,s) = (y-s)^2$ とする．
+$Q$ に関する２乗可積分関数の空間 $L^2(Q)$ の正規直交系
+\begin{equation*}
+	h_1(x) = 1, \qquad h_2(x) = \sqrt{3}x, \qquad 
+	h_3(x) = \tfrac{\sqrt{5}}{2}(3x^2 - 1)
+\end{equation*}
+を用いると，${\cal F} = \{ \theta_1 h_1(x) + \theta_2 h_2(x) \mid 
+\theta_1, \theta_2 \in \R \}$ である．
+真の入出力関係はこのモデルから少しずれており，
+\[
+	\varphi_o(x) = \lambda h_3(x) 
+\]
+という２次関数に，平均0分散 $\sigma^2$ の
+ガウスノイズが加わったものと仮定する．
+
+この設定のもとで経験損失最小（最小２乗誤差）による推定の
+汎化誤差を考える．今の場合
+$F(\vth_o) = 2 I_2$ となるので，汎化誤差最小規準は
+\begin{equation}
+	\min_{X_n} \trace \biggl[ \Bigl( \begin{smallmatrix}
+		1 & \sqrt{3}\overline{x} \\
+		\sqrt{3}\overline{x} & 3\overline{x^2}  \end{smallmatrix} \Bigr)^{-1} 
+		\biggr] = 
+	\min_{X_n} 
+	\frac{3\overline{x^2}+1}{3\overline{x^2} - 3 (\overline{x})^2}
+\label{eq:model_biased}
+\end{equation}
+になる．ここで $\overline{x}$, $\overline{x^2}$ はそれぞれ $x$, $x^2$ の
+サンプル平均である．(\ref{eq:model_biased})式を最小にするには，
+$|\overline{x}|$ を小さく $\overline{x^2}$ を大きくするのが
+よいので，$x = 1$ と $x = -1$ にデータ採取点を半分ずつ
+おくのが最適となる．
+
+ところが， $\lambda \neq 0$ のとき，すなわち
+真の入出力関係がモデルに属していないときに，
+このデータ採取法がよくないことは図\ref{fig:quad}
+を見れば明らかである．実際，
+データ数
+が無限大になったとき最小２乗誤差推定量 $\hvth $ は $\vth^* = (
+\sqrt{5} \lambda, 0)$ に近づくので，汎化誤差の期待値は，
+真の入出力関係と関数族のずれが主要項となり，
+\begin{equation}
+	R (X_n)  = \sigma^2 + 3 \lambda^2 + O(1/n)
+\label{eq:risk_2points}
+\end{equation}
+で与えられることが簡単な計算によりわかる．
+
+一方，受動的な学習においては，最適なパラメータ $\vth^{**}$ は
+\[
+	\int_{-1}^1 ( \theta_1 h_1(x)+ \theta_2 h_2(x) - \lambda h_3(x) )^2 
+	dx 
+\]
+を最小にするものとして与えられる．$h_a(x)$ の正規直交性より$
+	\theta_1^{**} = \theta_2^{**} = 0
+$
+が得られ，
+\begin{equation}
+\label{eq:risk_passive}
+	R(X_n)  =  \sigma^2
+	+ \lambda^2 + O(1/n)
+\end{equation}
+となる．(\ref{eq:risk_2points}),(\ref{eq:risk_passive})式
+より，データ数 $n$ がある程度大きいと
+受動学習のほうが汎化誤差が小さくなることがわかる．これは，真の入出力
+関係が設定したモデルに含まれるという前提が成り立たないために，
+その前提で導かれた最適学習データが，
+真の入出力関係とモデルとの距離を大きくしてしまった結果である．
+
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 5cm
+%   \epsfbox{ps/quad2.eps}
+%   \caption{１次関数系による学習：　一点鎖線は $\{\pm 1\}$ でのみデータを
+%   取った場合の最適な１次関数}
+% \label{fig:quad}
+% \end{center}
+% \end{figure}
+
+
+\subsection{モデル選択を組み合わせた能動学習}
+モデルの不適合によって引き起こされる能動学習の悪影響
+を防ぐには，（１）モデルが不適合な場合に汎化誤差を推定して，それを最小化
+するデータ点を探す，あるいは（２）モデルが適合するようにモデル選択を
+念入りに行う，の２種類の方針が考えられる．
+第１の方針では，モデルが一致していない場合に
+汎化誤差の推定が容易でないことが問題となる．
+未知である真の入出力関係とモデルとの距離を推定する必要が生じるため，
+\ref{sec:risk_expansion}節で論じた漸近的な方法は適用できない．また，
+汎化誤差を推定するには
+Cross Validation や Bootstrap (\cite{Bootstrap}) などの方法も考えられるが，
+汎化誤差の推定値が
+入力データ点にどのように依存するかを知るのが難しいくなる
+\footnote{Box \& Draper 
+(\cite{BoxDraper1959})では，真の関数とモデルとのずれを推定しそれを最小化
+するような入力点設計法を議論している．しかし，彼らの議論は，真の関数が
+ある線形の関数族に属しておりモデルがその部分族である場合を前提としており，
+適用範囲は限られると思われる．}．
+そこで，後者の方針にあるように，十分大きいモデルを用意して，
+真の入出力関係が設定したモデルにほぼ含まれているような状況を
+作り出すのがよいと考えられる．
+
+このようなモデル選択は，汎化誤差を最小にするために行う通常のモデル選択
+とは目的を異にしていることに注意しておく．
+モデル選択には，
+赤池情報量規準（AIC）や
+最小記述長原理（MDL）をはじめ様々な方法が
+あるが，これらは経験損失にモデルの複雑度を表すペナルティ項を加えたものを
+最小化する方法である．小さすぎるモデルでは経験損失が大きくなり，大きすぎる
+モデルではペナルティが大きくなることにより，適切なモデルが選択されるように
+なっている．
+しかしながら，能動学習に対してこの方針をそのまま用いるのは適当ではない．
+実際，能動学習では
+汎化誤差を評価するための入力分布と学習データとして用いられる
+データの分布が違ってもよいので，\ref{sec:mismatch}節の例でみたように，
+小さすぎるモデルを選んでも経験損失が
+大きくならず，そういうモデルが選択される可能性がある．
+これは能動学習に大きな悪影響を及ぼす．
+
+従って，能動学習を行う際には十分大きいモデルを用い，
+汎化誤差を小さくする役割はデータ点選択に任せるのがよいと考えられる．
+実際，実数直線上の多項式近似の問題では，データ採取点を
+上手く設計すると，理論的にはモデルサイズによらず
+汎化誤差の期待値が一定の値まで下げられることが示されている
+(\cite{fuku_poly})．
+Paass et al.(\cite{Paass_nips94})や Kindermann et al. (\cite{Paass_95})
+では，能動学習時にモデル選択を行って徐々にモデルの構造を複雑にしていく
+方法を提案している．また，Fukumizu(\cite{fuku_al_ieee})では，
+ニューラルネット
+モデルの能動学習において，大きいモデルから出発して必要な場合に
+モデルを小さくする方法を提案している．
+
+
+
+
+
+\section{ニューラルネットの能動学習}
+
+\label{sec:nn_al}
+ここでは学習機械として３層パーセプトロン(\cite{pdp})タイプの
+ニューラルネット
+を考え，その能動学習において生じる特別な状況を論じる．
+３層パーセプトロンは，次式の関数系 $\vvarphi(x; \vth)$ として定義される．
+\begin{equation*}
+	\vvarphi(x; \vth) = \sum_{j=1}^H \vv_j\, s(\vw_j^T x + \zeta_j) + 
+	\veta.
+\end{equation*}
+ここで，$\vv_j$, $\veta\in\R^M$, $\vw_j\in\R^L$, $\zeta_j\in\R$ 
+($1\leq j \leq H$) は
+パラメータであり，$\vth = (\vv_1^T,\zeta_1,\ldots, \vv_H^T, \zeta_H,
+\vv_1^T, \ldots, \vv_H^T, \veta^T)^T$ はパラメータ全体をあらわすベクトル
+である．また，$s(t)$ は一般に単調飽和型の１変数非線形関数であり，
+ロジスティック関数 $
+	s(t) = 1/(1+e^{-t})
+$
+や $s(t) = \tanh(t)$ などがよく使われる．このモデルは図\ref{fig:mlp}で
+表されるようなグラフィカルな表現を持ち，$H$ は中間素子の個数を表している．
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 3.5cm
+%   \epsfbox{ps/mlp.eps}
+%   \caption{３層パーセプトロン}
+% \label{fig:mlp}
+% \end{center}
+% \end{figure}
+
+
+ニューラルネットに対しても２節で述べた学習の
+一般的枠組みが利用できるが，能動学習やモデル選択を考えるとき特別な
+事情が現れる．それは，ニューラルネットモデルにおけるパラメータの識別不能性
+と呼ばれる問題である．そこで，識別不能性について以下で
+説明しよう．簡単のため，出力が１次元で中間素子が２個のモデル
+\begin{equation*}
+	\varphi(x;\vth) = v_1\, s(\vw_1^T x + \zeta_1) + 
+		v_2\, s(\vw_2^T x + \zeta_2) + \eta
+\end{equation*}
+を用いて説明する．中間素子関数 $s(t)$ は $\tanh(t)$ であると
+する．真の関数 $\varphi_o(x)$ 
+がモデルに含まれているとし，これが中間素子１個で表現可能な関数
+\begin{equation*}
+	\varphi_o(x) = v_0\, s(\vw_0^T x + \zeta_0) + \eta_0
+\end{equation*}
+であったと仮定しよう．真の関数を実現するパラメータ $\vth$ を考えると，
+２つの中間素子の内部パラメータを等しくおいた
+\[
+	\{ \vth \mid (\vw_1^T,\zeta_1) = (\vw_2^T,\zeta_2) = 
+		(\vw_0^T,\zeta_0),   v_1+v_2 = v_0, \eta = \eta_0 \}
+\]
+という集合内のパラメータは，すべて $\varphi_0$ と同一の関数を定める．
+重要なのは，この集合が高次元集合（この場合は直線)となっている
+点である．また，
+$
+	\{ \vth \mid (\vw_1^T,\zeta_1) = (\vw_0^T,\zeta_0), v_1 = v_0, 
+	\vw_2 = 0, v_2 s(\zeta_2) + \eta = \eta_0 \}
+$, 
+$
+	\{ \vth \mid (\vw_1^T,\zeta_1) = (\vw_0^T,\zeta_0), v_1 = v_0, 
+	\eta = \eta_0, v_2 = 0\}
+$
+で定義される２つの集合も，$\varphi_0(x)$ と同一の関数を定めるが
+(図\ref{fig:unident}参照），
+パラメータ空間の中で前者は$2$次元の曲面，
+後者は $(L+1)$次元のアフィン平面である．
+以上により，２個の中間素子を持つ
+モデルの中で，１個の中間素子で実現可能な関数を定めるパラメータ集合は
+高次元集合を成していることが確認できる．このように，同一の関数を
+定めるパラメータが
+一意的ではなく連続集合をなしているような状況を，パラメータが{\em 識別不能}
+であるという．
+
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 3.0cm
+%   \epsfbox{ps/unident.eps}
+%   \caption{３層パーセプトロンにおけるパラメータの識別不能性}
+% \label{fig:unident}
+% \end{center}
+% \end{figure}
+
+
+
+中間素子の非線形関数が $\tanh$ やロジスティック関数である場合には，
+３層パーセプトロンの
+パラメータが識別不能になるための条件は以下のように与えられる．
+詳細は \cite{Sussmann}, 
+\cite{localmin} をご覧頂きたい．
+\begin{thm}
+\label{thm:unident_mlp}
+中間素子関数を $\tanh$ とする．
+中間素子を$H$個持つ３層パーセプトロン
+モデルにおいて，パラメータが
+識別不能であることと，そのパラメータが定める関数が$H-1$個以下の中間素子を
+持つ３層パーセプトロンで実現可能であることは同値である．
+さらにこれは，\par
+{\rm [1]} ある $j$ が存在して，$\vw_j = 0$ \par
+{\rm [2]} ある $j$ が存在して，$\vv_j = 0$ \par
+{\rm [3]} ある $j_1 \neq j_2$ が存在して，
+$(\vw_{j_1}^T,\zeta_{j_1}) = \pm(\vw_{j_2}^T,\zeta_{j_2})$ \\
+のいずれかが成り立つことと同値である．
+\end{thm}
+
+真のパラメータが識別不能な
+状況で関数の学習を行うと何が起こるであろうか？ \ref{sec:active_learning}
+節では真のパラメータ $\vth_o$ を仮定して話を進めたが，今の状況では
+それが一意的ではないので
+ $\hvth$ が $\vth_o$ の近傍にあるという考えは適用できない．
+したがって，Taylor展開や，$E_{Y_n}[ (\hvth - \vth_o)(\hvth - \vth_o)^T]$ 
+の漸近展開などを使うことができず，それに基づいて導かれた
+規準（\ref{eq:Tr_crit})式はそのまま適用することができない．
+このような識別不能性は，ニューラルネットに限らず，
+複雑な構造を持つさまざまなモデルが持つ問題である．この話題については
+\cite{IwanamiSingular}が詳しく論じている．
+
+このような特異な現象は情報行列の退化としても捉えることができる．
+真のパラメータ集合の中の一点 $\vth_o$ を固定して，そこでの
+情報行列 $G(\vth_o)$ あるいは $H(\vth_o)$ を考える．このとき，例で
+みたように $\vth_o$ を
+含んだある方向に関して関数 $\varphi(x;\vth)$ は一定になる．
+この方向ベクトルを
+$\vu$ と置くと，方向微分 $\vu^T 
+\parder{\ell(y, \varphi(x; \vth)) }{\vth}$ は０になり，
+\[
+	\vu^T \parder{\ell(y, \varphi(x; \vth)) }{\vth}
+	\parder{\ell(y, \varphi(x; \vth)) }{\vth}\vu = 
+	\vu^T \frac{\partial^2 \ell(y, \varphi(x; \vth)) }
+	{\partial\vth \partial \vth}\vu = 0
+\]
+が成り立つので，$G(\vth_o)$ や $H(\vth_o)$ は退化している．
+このことからも，真のパラメータが
+識別不能な状況では，情報行列の逆行列や行列式を
+用いた能動学習の規準は用いることが出来ないことが確認できる．
+逆に，情報行列が逆行列を持たないのは，定理\ref{thm:unident_mlp}の３条件の
+いずれかを満たす場合に限られることが証明されている(\cite{fuku_fisher})．
+したがって，問題になるのは真の関数が少ない中間素子で表される場合である．
+現実の問題では，真の関数がモデルに属しており，しかもより小さい
+中間素子数で完全に実現されることはあり得ないかもしれないが，
+真の関数を実現するのに冗長に近い中間素子が存在すると，
+情報行列は０に近い固有値
+を有し，能動学習は安定しないことが予想される．
+
+\ref{sec:model_selec}節で，能動学習を用いる際には，
+真の入出力関係がモデルによって
+実現可能なぐらいにモデルを大きく設定する必要があることを述べた．
+しかし，本節の考察によれば，ニューラルネットではモデルが大きすぎると
+能動学習がうまく適用できない．したがって，ニューラルネットの
+能動学習では必要かつ十分なモデルサイズを選択する必要がある．
+そのためのひとつの手法として，Fukumizu (\cite{fuku_al_ieee})は
+最初に十分大きいモデルから出発して，
+次のような中間素子削除付きの学習を行うことを提案している．
+ここでは，中間素子の関数を $\tanh$ 
+とし，第$j$中間素子の出力値を $\hat{s}_j = 
+s(\hat{\vw}_j^T x + \hat{\zeta}_j)$ により
+省略している．また，$T$ は適当な自然数，$A$ は適当な正数である．
+
+\bigskip 
+\noindent
+{\bf [中間素子削除付きの学習則]}
+\newcounter{prun}
+\begin{list} 
+{{\bf \arabic{prun}}.}{\usecounter{prun}\setlength{\itemsep}{2pt}\setlength{\leftmargin}{20pt}}
+\item $t := 1$.  
+\item  $(x^{(t\, \bmod n)}, y^{(t\, \bmod n)})$ に対して$\hvth$ 
+を更新する．  
+\item もし $t \bmod T = 0$ ならば，次の手続きを行う．
+\begin{enumerate}
+\item[(a)] もし  
+${\displaystyle 
+\|\hat{\vv}_{j} \|^{2} \int (\hat{s}_{j}-s(\hat{\zeta}_{j}))^{2}
+q(x)dx < \frac{A}{n}}$ ならば，
+第$j$中間素子を削除し 
+$\veta \mapsto \veta + \vv_j s(\zeta_j)$ と変更する．
+\item[(b)] もし 
+${\displaystyle
+\|\hat{\vv}_{j}\|^{2} \int (\hat{s}_{j})^{2}q(x)dx < \frac{A}{n}}$, 
+ならば，第$j$中間素子を削除する．
+\item[(c)] もし $j_{1} \neq j_{2}$ に対し 
+${\displaystyle 
+\| \hat{\vv}_{j_{2}}\|^{2} \int ( \hat{s}_{j_{2}} \mp
+\hat{s}_{j_{1}})^{2} q(x)dx < \frac{A}{n} }$ 
+ならば，
+第$j_2$中間素子を削除し 
+$\vv_{j_1} \mapsto \vv_{j_1}\pm \vv_{j_2}$ と変更する． 
+\end{enumerate}
+\item $t := t + 1$. 
+\item もし $t > t_{MAX}$ ならば終了する．そうでなければ{\bf 2}へ行く． 
+\end{list}
+\bigskip
+(a)--(c)の４つの判定式は，定理\ref{thm:unident_mlp}の[1]--[3]に対応
+するものである．
+能動学習でパラメータを最適化する際に，上のような手法により冗長な中間素子を
+削除していき，情報行列が退化しないようにすることが重要となる．
+図\ref{fig:elim}は，多点探索を用いた確率的な能動学習に
+中間素子の削減を組み合わせた場合の，
+汎化誤差と中間素子数の推移の一例を示している．
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 6.0cm
+%   \epsfbox{ps/elim.eps}
+%   \caption{中間素子削除付きの能動学習}
+% \label{fig:elim}
+% \end{center}
+% \end{figure}
+
+\section{能動学習の応用例}
+\label{sec:application}
+最適実験計画という観点では
+1950年代から活発に理論的研究が行われている
+ものの，入出力関係を表す回帰関数を学習する現実の問題に対して，
+汎化誤差を小さくするための最適データ
+点を実験を行いながら選んだ応用例は少ない．
+これは，実際の実験にかかるコストから，試行錯誤的な
+テストが難しいことが一因であろうと考えられる．また，
+従来の実験により知られている
+関数関係から人工的にデータを発生させ，ニューラルネットによる
+能動学習の実験を行った例として，Bayes 的な
+立場から導いた規準に従って焼夷弾の効果の分類問題を学習させた 
+Belue et al. (\cite{Belue97})などがある．
+また Fukumizu(\cite{fuku_al_ieee})は
+色の表現をRGBからYMCに変換する関数を確率的な能動学習によって学習させた
+例を示している．
+以下では，後者の例についてやや詳しく述べる．
+
+カラープリンタなどのカラー印刷を行う機械では，
+CMY（シアン，マゼンタ，イエロー）表色形でインクの色を指定する
+ことが多い．一方，作られた印刷の物理的な色は
+RGB（レッド，グリーン，ブルー）によって表現される．CMYとRGBの変換関数は
+理論的には得られているが，
+所望のRGBを得るために機械に与えるCMYの設定値は，
+印刷機械の個々の特性などにより完全に理論値と一致するわけではない．
+そこで，特定の印刷機械に対し，
+あるRGBの値を持つ色を発生させるためのCMYの設定値を求める問題は，カラー印刷
+において重要となる．
+このRGBからCMYへの関数関係を３層パーセプトロンで学習する問題に
+能動学習の手法を用いる実験を行った．実験に際しては，実際の印刷機械から
+の測定を行わず，CMYからRGBへの変換関数として知られている 
+Neugebauer 方程式(\cite{color})を数値的に逆に解き，
+それに観測ノイズとして小さい分散を
+持つガウスノイズを加えたものを真の入出力関係として用いた．
+Neugebauer方程式は特にオフセット印刷では現実の色変換を非常によい精度で
+近似しているので，この入出力関係がよく学習できれば，
+実機においてもよい学習精度が期待できる．
+
+実験に用いた学習機械はロジスティック関数を中間素子関数として持つ
+３層パーセプトロンで，中間素子は７個から初め，\ref{sec:nn_al}節で
+述べた方法により冗長な中間素子があれば削除していった．
+能動学習は\ref{sec:prob_al}節で述べた，多点探索による確率的な
+能動学習を用いた．
+図\ref{fig:color}の右のグラフは，
+学習データの個数を徐々に増加させていったときの
+，３０回の試行に対する汎化誤差の平均値を表している．汎化誤差を
+測るための入力分布 $Q$ には $[0,1]^3$ 上の一様分布を用いている．
+このグラフからわかるように，受動的な学習と比較して能動学習法による
+汎化誤差の減少がみられ，能動学習が有効に機能していることが確認できる．
+
+
+
+
+% \begin{figure}[t]
+% \begin{center}
+% \leavevmode
+%  \epsfysize = 6.0cm
+%   \epsfbox{ps/lc_neuge.eps}
+%   \caption{色空間変換問題における３層パーセプトロンの能動学習．
+%   破線（一番下）が多点探索による能動学習．実線は\cite{fuku_al_ieee}で提案されている
+%   別の能動学習法，点線は受動的学習．}
+% \label{fig:color}
+% \end{center}
+% \end{figure}
+
+
+
+
+\section{おわりに}
+\label{sec:final}
+本章を締めくくるにあたって，ここで取り上げられなかった話題について簡単に
+触れる．また，能動学習に関するさまざまな話題を扱った
+特集が文献\cite{ipsj97}にあるので，そちらも合わせてみていただくとよい．
+
+最適データ点設計の問題においては，本章で述べたような経験損失最小化に
+よる学習のほかに Bayes 推定に基づいた方法も展開されている．
+\ref{sec:other_crit}節で述べた D-optimality, A-optimality などに対して，
+それぞれ
+Bayes 推定の枠組みにおける対応物が考察されている．
+Bayes 的な最適実験計画に関しては文献 \cite{ChalonerVerdinelli}に
+詳しい解説がある．
+
+本章で述べてきた能動学習の枠組みでは，
+学習のターゲットは時間的に不変な静的システムであり，かつ目的は
+学習の結果得られた推定量の精度であった．こういう簡単な
+場合を考えることによって理論的な展開が可能となり，それに基づく
+さまざまな手法が導き出された．
+しかしながら「能動的な学習」という言葉に対して，
+今まで述べた枠組みは限定的過ぎると感じられた方も
+多いであろう．実際，学習者が戦略を
+最適化する方法論には本章で述べたものと異なる枠組みも
+存在する．
+そのような例として Bandit 問題とマルコフ決定プロセスの学習に
+ついてごく簡単に紹介しておく．
+
+Two-armed bandit とはアームがふたつ付いたスロットマシンのことである．
+ふたつのアームを引くとそれぞれ確率 $p_1$, $p_2$ で
+１ドル賞金がもらえる機械を想定する．
+このとき，$p_1$, $p_2$ が未知として，
+$n$回アームを引いた際に
+賞金の期待値を最大化するような戦略を考えるのが
+Two-armed bandit 問題である．もちろん確率 $p_1$, $p_2$ が十分な
+精度で推定されていれば，確率の大きいアームを引いたほうがよいのは
+あきらかであるが，精度よく推定するためには多くの試行錯誤を必要とする．
+この問題では，単に推定精度を高めるのではなく，
+賞金の総和を多くすることが目的である点が，
+これまで述べた設定と本質的に異なっている．しかしながら，
+目的関数を最大にするために戦略を立てながら
+試行を行っていく点では，能動学習の一種と
+考えられる．
+全体の試行を２ステージに分けて，初期には確率の推定を
+行い後に確率の高いアームによって賞金を稼ぐ戦略など，
+さまざまな研究が数多くなされている．詳しくは文献\cite{Bandit}および
+その中の文献リストを見てほしい．
+
+Bandit 問題では，システムは時間的に不変で，時間的に
+独立に確率 $p_j$ に従う値を返すと考える場合が多いが，
+これを動的なシステムに拡張するとどうなるであろうか？
+その一つの定式化が強化学習あるいはマルコフ決定プロセスの学習
+と呼ばれているものである．
+時刻 $t$ において状態 $S_t \in {\cal S}$ を持つシステムがあるとしよう．
+学習者はこの系に対して動作 $A_t \in {\cal A}$ を施すことができ，
+現在の状態 $S_t$ と
+動作 $A_t$ に基づく報酬 $r_t \in \R$ が得られる．また，システムの状態も 
+$S_t$, $A_t$ に基づいて次の状態 $S_{t+1}$ に遷移する．
+一般にこの遷移は確率的であるが，現在の状態および動作のみによって次の状態が
+確率的に決まるので，マルコフ的であると言われる．
+状態遷移の確率や報酬を決定するルールは未知であると仮定する．
+このような問題設定のもと，現在の状態 $S_t$ から動作 $A_t$ を
+決める戦略 $\pi : {\cal S} \to {\cal A}$ の中で，期待される報酬の和を
+最も大きくするものを学習するのが強化学習である．
+このような問題に対して，TD-learning，Q-learning と呼ばれる有効な
+学習方法が提案されている．これらの学習では，現在得られている情報から
+報酬を大きくするような行動を決める一方，確率的なルールを推定する
+ために色々な状態を探索的に現出させることが必要となる．
+強化学習に関しては，Barto, Sutton, Watkins 
+による解説(\cite{RL})や Sutton, Barto による教科書(\cite{RLbook})を
+見てほしい．
+
+さて，本章では主として理論的な基礎がきちんとした学習の話題を取り扱ったが，
+「能動学習」という言葉は，本来もっと広い枠組みで捉えることが可能だと
+思われる．たとえば，ロボットの行動学習をする際に，情報をよりくわしく
+取りたい場所を細かく調べる戦略などは，まさに能動的な学習そのものである．
+また，より詳しく見たい場所に視点を制御する
+アクティブ・ヴィジョンの技術(\cite{active_vision})は，
+視覚系の情報を用いた学習システムにおける能動的学習の基盤といえるであろう．
+本章で述べたような能動学習の理論がさらにその枠組みを広げ，
+ロボットの学習などのより実世界的な学習問題の基礎付けへと発展していくことを
+期待している．
+
+
+
+\begin{thebibliography}{10}
+
+\bibitem{CV}
+M.~Stone.
+\newblock Cross-validatory choice and assessment of statistical predictions.
+\newblock {\em J. Royal Stat. Soc.}, 36:111--133, 1974.
+
+\bibitem{Lehmann}
+E.L. Lehmann",
+\newblock {\em Theory of point estimation}.
+\newblock John Wiley \& Sons, 1983.
+
+
+\bibitem{Fedorov}
+V.V. Fedorov.
+\newblock {\em Theory of Optimal Experiments}.
+\newblock Academic Press, New York, 1972.
+
+\bibitem{fuku_al_ieee}
+K. Fukumizu.
+\newblock Statistical active learning in multilayer perceptrons.
+\newblock {\em IEEE Trans. Neural Networks}, 11(1):17--26, 2000.
+
+\bibitem{CohnAL}
+D.A. Cohn.
+\newblock Neural network exploration using optimal experiment design.
+\newblock In Jack~D. Cowan, G. Tesauro, and J. Alspector, editors, {\em
+  Advances in Neural Information Processing Systems}, volume~6, pages 679--686.
+  Morgan Kaufmann, 1994.
+
+\bibitem{res_surf}
+W.~J. Hill and W.~G. Hunter.
+\newblock A review of response surface methodology: A literature survey.
+\newblock {\em Technometrics}, 8(4):571--590, 1966.
+
+\bibitem{res_surf2}
+A.~I.~Khuri, R.~H.~Myers, and Jr. W.~H.~Carter.
+\newblock Response surface methodology: 1966-1988.
+\newblock {\em Technometrics}, 31(2):137--157, 1989.
+
+\bibitem{Bootstrap}
+B. Efron and R. Tibshirani.
+\newblock {\em An Introduction to the Bootstrap}.
+\newblock Chapman and Hall, New York, 1993.
+
+\bibitem{Paass_95}
+J.~Kindermann, G.~Paass, and F.~Weber.
+\newblock Query construction for neural networks using the bootstrap.
+\newblock In {\em Proc. Intern. Conf. Artificial Neural
+  Networks 95}, pages 135--140, 1995.
+
+\bibitem{KW_equiv}
+J.~Kiefer and J.~Wolfowitz.
+\newblock The equivalence of two extremum problems.
+\newblock {\em Canadian J. Math.}, 12:363--366, 1960.
+
+\bibitem{BoxDraper1959}
+G.E.P. Box and N.R. Draper.
+\newblock A basis for the selection of a response surface desing. 
+\newblock {\em J. American Stat. Assoc.}, 54:622--654, 1959.
+
+\bibitem{fuku_poly}
+福水健次, 渡邊澄夫.
+\newblock 多項式近似における学習データの最適設計と予測誤差.
+\newblock {\em 電子情報通信学会論文誌A}, J79-A(5):1100--1108, 1996.
+
+\bibitem{Paass_nips94}
+G. Paass and J. Kindermann.
+\newblock Bayesian query construction for neural network models.
+\newblock In G.~Tesauro, D.~Touretzky, and T.~Leen, editors, {\em Advances in
+  Neural Information Processing Systems}, volume~7, pages 443--450. The {MIT}
+  Press, 1995.
+
+\bibitem{pdp}
+D.E. Rumelhart, G.~E. Hinton, and R.~J. Williams.
+\newblock Learning internal representations by error propagation.
+\newblock In D.~E. Rumelhart, J.~L. McClelland, and the PDP Research~Group,
+  editors, {\em Parallel Distributed Processing}, volume~1, pages 318--362. MIT
+  Press, Cambridge, 1986.
+
+\bibitem{Sussmann}
+H.~J. Sussmann.
+\newblock Uniqueness of the weights for minimal feedforward nets with a given
+  input-output map.
+\newblock {\em Neural Networks}, 5:589--593, 1992.
+
+\bibitem{localmin}
+K. Fukumizu and S. Amari.
+\newblock Local minima and plateaus in hierarchical structures of multilayer
+  perceptrons.
+\newblock {\em Neural Networks}, 13(3):317--327, 2000.
+
+\bibitem{fuku_fisher}
+K. Fukumizu.
+\newblock A regularity condition of the information matrix of a multilayer
+  perceptron network.
+\newblock {\em Neural Networks}, 9(5):871--879, 1996.
+
+\bibitem{IwanamiSingular}
+福水健次，栗木哲，竹内啓，赤平昌文．
+\newblock 特異モデルの統計学．
+\newblock 岩波書店，2004.
+
+\bibitem{Belue97}
+L.M. Belue, Jr.K.W.~Bauer, and D.W. Ruck.
+\newblock Selecting optimal experiments for multiple output multilayer
+  perceptrons.
+\newblock {\em Neural Computation}, 9:161--183, 1997.
+
+\bibitem{color}
+日本色彩学会（編）.
+\newblock {\em 新編色彩科学ハンドブック（第２版）}.
+\newblock 東京大学出版会, 1998.
+
+\bibitem{ipsj97}
+中村篤祥（編）特集 能動学習. {\em 情報処理}, 38(7):557--588, 1997.
+
+\bibitem{ChalonerVerdinelli}
+K. Chaloner and I. Verdinelli.
+\newblock Bayesian experimental design: A review.
+\newblock {\em Statistical Science}, 10(3):273--304, 1995.
+
+\bibitem{Bandit}
+D.A. Berry and B.~Fristedt.
+\newblock {\em Bandit Problems: Sequential Allocation of Experiments}.
+\newblock Chapman and Hall, 1985.
+
+\bibitem{RL}
+A.G. Barto, R.S. Sutton, and C.J.C.H. Watkins.
+\newblock Learning and sequential decision making.
+\newblock In M.~Gabriel and J.W. Moore, editors, {\em Learning and
+  Computational Neuroscience: Foundations of Adaptive Networks}, pages
+  539--602. 1990.
+
+\bibitem{RLbook}
+R.S. Sutton and A.G. Barto.
+\newblock {\em Reinforcement Learning: An Introduction}.
+\newblock MIT Press, 1998.
+
+\bibitem{active_vision}
+A. Blake and A. Yuille, editors.
+\newblock {\em Active Vision}.
+\newblock MIT Press, 1992.
+
+\bibitem{Fukushima_nlopt}
+福島雅夫.
+\newblock {\em 非線形最適化の基礎}.
+\newblock 朝倉書店, 2001.
+
+
+\end{thebibliography}
+
+
+\appendix
+
+
+\section{Carath\'{e}odory の定理}
+\begin{thm}
+$\Delta$ を $\R^d$ 内の集合とする．$\vz$ が $\Delta$ の
+点の凸結合であるとき，$\vz$ はたかだか $d+1$ 個の $\Delta$ の点
+の凸結合として表される．すなわち，
+$\sum_{i=1}^{d+1}p_i = 1$ を満たす $p_i \geq 0$ と 
+$\vz_i \in \Delta$ $(1 \leq i \leq d+1)$ が存在して，
+$
+	\vz = \sum_{i=1}^{d+1} p_i \vz_i
+$
+と書ける．
+\end{thm}
+証明は例えば \cite{Fukushima_nlopt} を見よ．
+
+
+\section{行列式に関する関係式}
+\begin{lma}
+\label{lma:det}
+正方行列 $A$, $D$ が正則であるとき，正方行列 
+$
+	H = \bigl( \begin{smallmatrix} A & B \\ C & D \end{smallmatrix} \bigr)
+$
+に対して，
+\begin{equation*}
+	|H| = |A| | D-  C A^{-1}B| = |D| | A -  B D^{-1} C |
+\end{equation*}
+が成り立つ．
+\end{lma}
+% \begin{proof}
+% \[
+% 	H = \Bigl( \begin{smallmatrix} I & 0 \\ C A^{-1} & I \end{smallmatrix}
+% 		\Bigr)
+% 	 \Bigl( 
+% 	 \begin{smallmatrix} A & 0 \\ 0 & D - C A^{-1}B \end{smallmatrix} 
+% 	  \Bigr)
+% 	 \Bigl( \begin{smallmatrix} I & A^{-1} B  \\ 0 & I \end{smallmatrix}
+% 	  \Bigr)
+% 	 = \Bigl( 
+% 	   \begin{smallmatrix} I & B D^{-1} \\ 0 & I \end{smallmatrix} \Bigr)
+% 	 \Bigl( 
+% 	 \begin{smallmatrix} A - B D^{-1} C & 0 \\ 0 & D \end{smallmatrix}
+% 	   \Bigr)
+% 	 \Bigl( 
+% 	  \begin{smallmatrix} I & 0  \\ D^{-1}C & I \end{smallmatrix}
+% 	 \Bigr)
+% \]
+% より明らか．
+% \end{proof}
+
+\end{document}
