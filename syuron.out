@@ -11,19 +11,21 @@
 \BOOKMARK [1][-]{section.2.5}{2.5 まとめ}{chapter.2}% 11
 \BOOKMARK [0][]{chapter.3}{第3章 提案手法}{}% 12
 \BOOKMARK [1][-]{section.3.1}{3.1 概要}{chapter.3}% 13
-\BOOKMARK [1][-]{section.3.2}{3.2 提案システムの詳細}{chapter.3}% 14
-\BOOKMARK [1][-]{section.3.3}{3.3 バッチ型能動学習への拡張}{chapter.3}% 15
-\BOOKMARK [1][-]{section.3.4}{3.4 まとめ}{chapter.3}% 16
-\BOOKMARK [0][]{chapter.4}{第4章 実験1 : MNISTを用いた実験}{}% 17
-\BOOKMARK [1][-]{section.4.1}{4.1 実験設定}{chapter.4}% 18
-\BOOKMARK [1][-]{section.4.2}{4.2 実験結果}{chapter.4}% 19
-\BOOKMARK [1][-]{section.4.3}{4.3 考察}{chapter.4}% 20
-\BOOKMARK [0][]{chapter.5}{第5章 実験1 : 病理画像を用いた実験}{}% 21
-\BOOKMARK [1][-]{section.5.1}{5.1 実験設定}{chapter.5}% 22
-\BOOKMARK [1][-]{section.5.2}{5.2 実験結果}{chapter.5}% 23
-\BOOKMARK [1][-]{section.5.3}{5.3 考察}{chapter.5}% 24
-\BOOKMARK [0][]{chapter.6}{第6章 結論}{}% 25
-\BOOKMARK [1][-]{section.6.1}{6.1 本研究の結論}{chapter.6}% 26
-\BOOKMARK [1][-]{section.6.2}{6.2 今後の課題}{chapter.6}% 27
-\BOOKMARK [0][]{chapter*.13}{参考文献}{}% 28
-\BOOKMARK [0][]{appendix.A}{付録A ソースコード}{}% 29
+\BOOKMARK [1][-]{section.3.2}{3.2 Query by Dropout predictions}{chapter.3}% 14
+\BOOKMARK [1][-]{section.3.3}{3.3 推論時でのData Augmentationの利用}{chapter.3}% 15
+\BOOKMARK [1][-]{section.3.4}{3.4 提案手法の動作原理}{chapter.3}% 16
+\BOOKMARK [1][-]{section.3.5}{3.5 バッチ型能動学習への拡張}{chapter.3}% 17
+\BOOKMARK [1][-]{section.3.6}{3.6 アルゴリズムの流れ}{chapter.3}% 18
+\BOOKMARK [0][]{chapter.4}{第4章 実験1 : MNISTを用いた実験}{}% 19
+\BOOKMARK [1][-]{section.4.1}{4.1 実験設定}{chapter.4}% 20
+\BOOKMARK [1][-]{section.4.2}{4.2 実験結果}{chapter.4}% 21
+\BOOKMARK [1][-]{section.4.3}{4.3 考察}{chapter.4}% 22
+\BOOKMARK [0][]{chapter.5}{第5章 実験1 : 病理画像を用いた実験}{}% 23
+\BOOKMARK [1][-]{section.5.1}{5.1 実験設定}{chapter.5}% 24
+\BOOKMARK [1][-]{section.5.2}{5.2 実験結果}{chapter.5}% 25
+\BOOKMARK [1][-]{section.5.3}{5.3 考察}{chapter.5}% 26
+\BOOKMARK [0][]{chapter.6}{第6章 結論}{}% 27
+\BOOKMARK [1][-]{section.6.1}{6.1 本研究の結論}{chapter.6}% 28
+\BOOKMARK [1][-]{section.6.2}{6.2 今後の課題}{chapter.6}% 29
+\BOOKMARK [0][]{chapter*.13}{参考文献}{}% 30
+\BOOKMARK [0][]{appendix.A}{付録A ソースコード}{}% 31
