@@ -163,19 +163,24 @@ fine-tuningとは、ニューラルネットワークを学習するため、別
 \subsection{クエリ選考基準}
 \label{query_strategy}
 本項では、モデル更新に寄与する可能性が高いと判断するためのクエリ選考基準として提案されているいくつかのものについて述べる
-
-$\mathcal{L}$をラベル付きデータセット、$\mathcal{U}$をラベルなしデータセットとする
+$\mathcal{L}$をラベル付きデータセット、$\mathcal{U}$をラベルなしデータセットとする。
+クエリはそれぞれの選考基準で使用されるスコアリング関数を最大にするサンプルを選択するものとする。
+\begin{eqnarray}
+    x^{*} = \argmax_{x \in \mathcal{U}} \: score(x)
+\end{eqnarray}
+また、識別器のパラメータを$\theta$とし、サンプル$x$が与えられた時のクラスラベル$y$の予測確率を$P_{\theta}(y|x)$とする。
 
 \subsubsection{Uncertainty Sampling}
 最もシンプルな戦略で、モデルが自身の予測が最も曖昧であるようなサンプルをクエリとして選択する。
 データ$x$が与えられた時、ラベルの確率分布$p(y|x)$を出力する識別器を用いれば利用することが出来るため、幅広く利用されている。
 曖昧であることの定量評価として、事後確率最大ラベルの確率が小さいサンプルを選択するLeast Confident、事後確率最大ラベルの確率と、
 その次に大きなラベルの確率との差が小さいサンプルを選択するMargin Sampling、事後確率分布のエントロピーが大きいサンプルを選択するEntropy Samplingなどが提案されている。
-これらは、二値分類の場合は全て等価な戦略となる。
-% Least Confident : 最も事後確率が高いクラスラベルの予測確率が最も小さくなるものを選ぶ
-% \begin{equation}
-%     x^{*} = \argmax_x \: 1 - P_{\theta}(\hat{y}|x)
-% \end{equation}
+これらは、二値分類の場合は全て等価な戦略となる。\todo{式いい感じに}
+\begin{eqnarray}
+    score(x) &=& 1 - P_{\theta}(\hat{y}|x)  \;\; \mbox{(Least Confident)} \\ \nonumber \\ 
+    score(x) &=& P_{\theta}(\hat{y}_1|x) - P_{\theta}(\hat{y}_2|x)  \;\; \mbox{(Margin Sampling)} \\ \nonumber \\
+    score(x) &=& - \sum_i {P_{\theta}(y_i|x)} \log P_{\theta}(y|x)  \;\; \mbox{(Entropy Sampling}
+\end{eqnarray}
 
 \subsubsection{Query By Committee}
 モデルのバージョン空間 (モデルの仮説空間内で現在のラベル付きデータに対してConsistentな領域)を
@@ -186,15 +191,15 @@ $\mathcal{L}$をラベル付きデータセット、$\mathcal{U}$をラベルな
 それぞれのcommitteeの予測が最も不一致するサンプルを選択するという戦略である。
 不一致度の定量評価として、Vote Entropy、Average Kullback Divergenceがある。
 Vote Entropyは、それぞれのcommitteeがどのラベルだと予測(投票)したかのばらつきを定量化したもので、次式で表される
-\begin{equation}
-    x^{*} = \argmax_x \: - \sum_i \frac{V(y_i)}{C} \log \, \frac{V(y_i)}{C}
-\end{equation}
+\begin{eqnarray}
+    score(x) =  - \sum_i \frac{V(y_i)}{C} \log \, \frac{V(y_i)}{C}
+\end{eqnarray}
 $V(y_i)$はcommitteeの投票数、$C$はcommitteeのサイズである。
 
 Average Kullback Divergenceは、それぞれ予測分布の確率分布の差異が平均的に大きいものを選ぶ手法である。
-\begin{equation}
-    x^{*} = \argmax_x \:  \frac{1}{C} \sum_{c=i}^C KL \, (P_{\theta^{(c)}} || P_C)
-\end{equation}
+\begin{eqnarray}
+    score(x) =  -  \frac{1}{C} \sum_{c=i}^C KL \, (P_{\theta^{(c)}} || P_C)
+\end{eqnarray}
 $P_C$はcommittee全体の平均の確率予測分布である。
 
 \subsubsection{Expected Model Change / Expected Error Reduction}
@@ -205,9 +210,9 @@ $P_C$はcommittee全体の平均の確率予測分布である。
 
 \subsubsection{Variance Reduction}
 モデルの期待汎化誤差は以下のように分解することが出来る。
-\begin{equation}
+\begin{eqnarray}
     E_T [(\hat{y} - y)^2|x] = E_T [(y - E[y|x])^2] + (E_{\mathcal{L}}[\hat{y}] - E[y|x])^2 + E_{\mathcal{L}} [(\hat{y} - E_{\mathcal{L}}[\hat{y}^2]
-\end{equation}
+\end{eqnarray}
 $E_{\mathcal{L}}[\cdot]$はラベルセット$\mathcal{L}$に関する期待値、$E[\cdot]$は条件付き分布$P(y|x)$に関する期待値、$E_T$はそれぞれに関する期待値である。
 上記の右辺は、一項目から、ラベルノイズに関する項、モデルバイアスに関する項、モデルの分散に関する項を表している。
 これらのうち、学習によって変更できるのはモデルの分散のみである。
@@ -221,14 +226,14 @@ $E_{\mathcal{L}}[\cdot]$はラベルセット$\mathcal{L}$に関する期待値�
 選択する価値が高いと考えられる。
 そのような手法の一つにInformation Densityがある。
 基本的に、他の選択戦略と併せて使用される手法で、各定量評価に類似度を考慮した係数を掛け合わせることで重みをつける手法である。
-\begin{equation}
-    x^{*} = \argmax_x \:  \phi(x) \times (\frac{1}{U} \sum_{u=1}^{U} s(x, x_i)))^{\beta}
-\end{equation}
+\begin{eqnarray}
+    score'(x) = score(x) \times (\frac{1}{U} \sum_{u=1}^{U} s(x, x_i)))^{\beta}
+\end{eqnarray}
 
-$\phi(x)$は他の選択戦略による評価である。$s(\cdot)$はサンプル間の類似度を算出する関数である。
+$s(\cdot)$はサンプル間の類似度を算出する関数である。
 
 \subsection{関連する他の手法}
-
+\todo{章立て微妙}
 \subsubsection{バッチ型能動学習}
 多くの能動学習の研究では、クエリ問い合わせは一つのサンプルにのみ行われる。
 しかし、近年の機械学習アルゴリズムは計算コストが非常に大きいため、一度に複数のクエリ集合$\mathcal{Q}$を問い合わせるバッチ能動学習に関する研究が増加しつつある。
@@ -244,7 +249,7 @@ brinker et al.、Xu et al.らはクラスタリング手法によって同一ク
 \com{active + Pathology}
 能動学習を病理画像解析に利用した研究は複数存在する。
 複数人のWSIから切り出したパッチベースでの学習を行う病理画像解析では、クエリとしてWSI中の１領域を問い合わせるのが自然である。
-しかし、通常のデータ分布とは違い、独立同一分布 (i.i.d)でない特徴がある。
+しかし、通常のデータ分布とは違い、独立同一分布 (i.i.d)でないという特徴がある。
 NalisNik et al.はUncertainty Samplingによる能動学習を比較的単純な細胞核segmentationタスクに応用した\cite{nalisnik2017interactive}。
 class balancing + query-by-committee\cite{doyle2011active}, 
 logistic regression + variance reduction \cite{padmanabhan2014active},

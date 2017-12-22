@@ -39,6 +39,12 @@ Uncertainty Samplingによってクエリ選択を行う。
 そこで、本研究では、多くの深層学習のアーキテクチャで正則化の目的で利用されるDropoutによって、
 本体のネットワークからサンプリングされた部分ネットワークをCommitteeとみなし、
 それらの予測の不一致度を利用して近似的にQuery-By-Committeeを行う手法を提案する（Fig.\ref{fig:query_by_dropout}）。
+つまり、本体のネットワーク$\mathcal{M}$から生成された部分ネットワーク$\mathcal{C} = \{\mathcal{M}_{p_1}, \mathcal{M}_{p_2}, \dots, \mathcal{M}_{p_c} \}$を用いて
+以下のAverage Kullback Divergenceを計算する。
+\begin{eqnarray}
+    score(x) =  -  \frac{1}{C} \sum_{c=i}^C KL \, (P_{\theta^{(c)}} || P_C)
+\end{eqnarray}
+\todo{disagreementだけじゃなくて不確かさも利用する話どこでしようかな}
 これらの部分ネットワークがCommitteeとして利用されるためには、それらが訓練データに対してはConsistentであり、
 かつ、それぞれの未知データに対する出力には分散を持つ必要がある。
 この性質について実験で検証し、Uncertainty Samplingのみを利用する方法と比較する。
@@ -80,7 +86,7 @@ Data augmentationを利用することで
 
 \subsubsection{CNNの中間特徴量}
 Imagenetで学習された特徴量は様々なタスクに有用であるとされており、多数の医療画像解析で利用されている。
-本研究ではGoogleNetの中間特徴量を利用した。
+本研究ではGoogleNetの中間特徴量512次元を利用した。
 
 \subsubsection{compact bilinear poolingによる特徴量}
 近年の深層学習を用いたテクスチャ解析の研究で、Bilinear Poolingによって空間情報をなくした特徴量がしばしば利用される。
@@ -91,8 +97,69 @@ G_{ij} = \sum_k{F_{ik} F_{jk}}
 また、一般にCNNの特徴量次元（チャンネル数）は256~512の大きな値であるため、そのまま計算した場合非常に高次元な値となってしまう。
 そこで、その近似手法であるCompact Bilinear Pooling\cite{gao2016compact}を本研究ではCNNを用いたテクスチャ特徴量として採用する。
 
-\section{アルゴリズムの流れ}
-以上で述べたそれぞれの手法をまとめる
+これらを比較するために、それぞれの特徴量を用いて病理画像データセットをK-meansによってクラスタリングを行った際の
+各クラスター内のラベルの不純度を平均を計算した。不純度が小さいほどクラスター内でのばらつきが小さく良い特徴量だと言える\todo{ちょいあやしいか}。
+データセットは100000枚の病理画像からなり、癌と正常の割合は均等に調整した。
+使用したデータセットの詳細は第5章で説明する。
+表\ref{table:compare_feat}に示すように、CNNを用いたテクスチャ特徴量であるCompact Bilinear Poolingをクラスタリングに用いるのが妥当であると考えられる。
+
+\begin{table}[h]
+  \label{table:compare_feat}
+  \caption{比較実験の結果}
+  \center
+  \begin{tabular}{c|c} \hline
+     手法 & Accuracy \\ \hline
+    LBP & 0.396 \\
+    CNNの中間特徴量 & 0.335  \\ 
+    Compact Bilinear Pooling & $\textbf{0.330}$ \\ \hline
+  \end{tabular}
+\end{table}
+
+\section{アルゴリズムの詳細}
+
+Algorithm.\ref{algo:dal}に本研究で提案するアルゴリズムの詳細を示した。
 
 
+\begin{algorithm}[h]
+    \caption{Deep Active Learning for Pathological Image Analysis}
+    \label{algo:dal}
+    \begin{algorithmic}
+        \STATE \textbf{Input: } 
+        unlabeled dataset $\mathcal{U}$,
+        clustering size $k$, 
+        active sampling size $K$,
+    \end{algorithmic}
 
+    \begin{algorithmic}
+        \STATE \textbf{Output: } paramters of network $\mathcal{M}$
+    \end{algorithmic}
+    
+    \begin{algorithmic}[1]
+        \STATE Initialize pre-trained network $\mathcal{M}_{pretrained}$
+        \STATE Perform k-means clustering with texture representation \\
+        and devide $\mathcal{U}$ to disjoint clusters $\mathcal{U}_1, \mathcal{U}_2, \dots, \mathcal{U}_k$
+        \STATE Initialize labeled dataset $\mathcal{L}$ from each disjoint clusters
+        \STATE $\mathcal{M} \leftarrow train (\mathcal{M}_{pretrained}, \mathcal{L})$
+        \REPEAT
+            \STATE sample committees $\mathcal{C} = \{\mathcal{M}_{p_1}, \mathcal{M}_{p_2}, \dots, \mathcal{M}_{p_c} \}$ from $\mathcal{M}$ using $dropout$ 
+            \FOR {$each \; x_i \in \mathcal{U}$}
+                \STATE $score (x) \; = disagreement\_score \; (x, \; \mathcal{C}) $
+            \ENDFOR
+            \STATE $\mathcal{Q} \leftarrow \O$, $\mathcal{D} \leftarrow \O$
+            \WHILE{$len(\mathcal{Q}) < K$}
+            \STATE $x^{\ast} = \argmax_{x \in \mathcal{U}} score(x)$
+            \STATE $idx = cluster(x^{\ast})$
+            \IF{$idx \notin D$}
+            \STATE $\mathcal{Q} \leftarrow \mathcal{Q} \cup \{x^{\ast}\}, \mathcal{D} \leftarrow \mathcal{D} \cup \{idx\}$
+
+            \ENDIF
+
+            \ENDWHILE
+            \STATE Query labels for $\mathcal{Q}$
+            \STATE $\mathcal{L} \leftarrow \mathcal{L} \cup \mathcal{Q}$
+            \STATE $\mathcal{M} \leftarrow train (\mathcal{M}_{pretrained}, \mathcal{L})$
+
+      \UNTIL{perfomance is satisfactory}
+    \end{algorithmic}
+  \end{algorithm}
+  
