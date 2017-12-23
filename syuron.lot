@@ -1,11 +1,10 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces 比較実験の結果}}{15}{table.3.1}
+\contentsline {table}{\numberline {3.1}{\ignorespaces 比較実験の結果}}{17}{table.3.1}
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces MNISTの実験に使用したCNNの構造を示す。}}{17}{table.4.1}
-\contentsline {table}{\numberline {4.2}{\ignorespaces それぞれのクエリ選考基準を利用した場合にテスト精度を達成するために要したラベルの数}}{18}{table.4.2}
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces MNISTの実験に使用したCNNの構造を示す。}}{18}{table.4.1}
+\contentsline {table}{\numberline {4.2}{\ignorespaces それぞれのクエリ選考基準を利用した場合にテスト精度を達成するために要したラベルの数}}{21}{table.4.2}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

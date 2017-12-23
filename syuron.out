@@ -18,17 +18,15 @@
 \BOOKMARK [1][-]{section.3.6}{3.6 アルゴリズムの詳細}{chapter.3}% 18
 \BOOKMARK [0][]{chapter.4}{第4章 実験1 : MNISTを用いた予備実験}{}% 19
 \BOOKMARK [1][-]{section.4.1}{4.1 概要}{chapter.4}% 20
-\BOOKMARK [1][-]{section.4.2}{4.2 データセットについて}{chapter.4}% 21
-\BOOKMARK [1][-]{section.4.3}{4.3 実験設定}{chapter.4}% 22
-\BOOKMARK [1][-]{section.4.4}{4.4 実験結果}{chapter.4}% 23
-\BOOKMARK [1][-]{section.4.5}{4.5 考察}{chapter.4}% 24
-\BOOKMARK [0][]{chapter.5}{第5章 実験2 : 病理画像データセットを用いた実験}{}% 25
-\BOOKMARK [1][-]{section.5.1}{5.1 概要}{chapter.5}% 26
-\BOOKMARK [1][-]{section.5.2}{5.2 実験設定}{chapter.5}% 27
-\BOOKMARK [1][-]{section.5.3}{5.3 実験結果}{chapter.5}% 28
-\BOOKMARK [1][-]{section.5.4}{5.4 考察}{chapter.5}% 29
-\BOOKMARK [0][]{chapter.6}{第6章 結論}{}% 30
-\BOOKMARK [1][-]{section.6.1}{6.1 本研究の結論}{chapter.6}% 31
-\BOOKMARK [1][-]{section.6.2}{6.2 今後の課題}{chapter.6}% 32
-\BOOKMARK [0][]{chapter*.17}{参考文献}{}% 33
-\BOOKMARK [0][]{appendix.A}{付録A ソースコード}{}% 34
+\BOOKMARK [1][-]{section.4.2}{4.2 実験設定}{chapter.4}% 21
+\BOOKMARK [1][-]{section.4.3}{4.3 実験結果}{chapter.4}% 22
+\BOOKMARK [1][-]{section.4.4}{4.4 考察}{chapter.4}% 23
+\BOOKMARK [0][]{chapter.5}{第5章 実験2 : 病理画像データセットを用いた実験}{}% 24
+\BOOKMARK [1][-]{section.5.1}{5.1 概要}{chapter.5}% 25
+\BOOKMARK [1][-]{section.5.2}{5.2 実験設定}{chapter.5}% 26
+\BOOKMARK [1][-]{section.5.3}{5.3 実験結果}{chapter.5}% 27
+\BOOKMARK [1][-]{section.5.4}{5.4 考察}{chapter.5}% 28
+\BOOKMARK [0][]{chapter.6}{第6章 結論}{}% 29
+\BOOKMARK [1][-]{section.6.1}{6.1 結論}{chapter.6}% 30
+\BOOKMARK [1][-]{section.6.2}{6.2 今後の課題}{chapter.6}% 31
+\BOOKMARK [0][]{chapter*.18}{参考文献}{}% 32

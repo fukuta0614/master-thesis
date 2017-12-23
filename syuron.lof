@@ -1,13 +1,13 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図。（左）通常のネットワーク (右)いくつかのニューロンをDropされたネットワーク}}{4}{figure.2.1}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces 病理画像の例。{\color {red} (ToDo: {もうちょいいい感じのやつ})}}}{5}{figure.2.2}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図。（左）通常のネットワーク (右)いくつかのニューロンをDropされたネットワーク}}{5}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces 病理画像の例。{\color {red} (ToDo: {もうちょいいい感じのやつ})}}}{6}{figure.2.2}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図}}{12}{figure.3.1}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。}}{13}{figure.3.2}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図}}{14}{figure.3.1}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。}}{15}{figure.3.2}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}}{18}{figure.4.1}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}}{20}{figure.4.1}
 \addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}}{23}{figure.5.1}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
