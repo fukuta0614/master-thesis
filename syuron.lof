@@ -1,13 +1,25 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図。（左）通常のネットワーク (右)いくつかのニューロンをDropされたネットワーク}}{5}{figure.2.1}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces 病理画像の例。{\color {red} (ToDo: {もうちょいいい感じのやつ})}}}{6}{figure.2.2}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図。（左）通常のネットワーク (右)いくつかのニューロンがDropされたネットワーク\relax }}{5}{figure.caption.4}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Data Augmentationの例。Random Crop、Random Rotation、Random Flip、Random Color Augmentationを行った。\relax }}{6}{figure.caption.5}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces 病理画像の例。{\color {red} (ToDo: {もうちょいいい感じのやつ})}\relax }}{7}{figure.caption.6}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces 同じ細胞組織を異なる細胞スキャナーによって撮像したもの。色、解像度、輝度に大きな変化があることがわかる。\relax }}{8}{figure.caption.7}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図}}{14}{figure.3.1}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。}}{15}{figure.3.2}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図\relax }}{15}{figure.caption.15}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。\relax }}{16}{figure.caption.16}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める\relax }}{17}{figure.caption.17}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}}{20}{figure.4.1}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{24}{figure.caption.27}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces 各手法によってクエリとして選択されたサンプルを示す。\relax }}{25}{figure.caption.29}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{25}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain Sampling}}}{25}{subfigure.2.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP}}}{25}{subfigure.2.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Uncertain + QBDP + AugOnInference}}}{25}{subfigure.2.4}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}}{23}{figure.5.1}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{28}{figure.caption.31}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces 各手法によってクエリとして選択されたサンプルを示す。\relax }}{29}{figure.caption.32}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{29}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain + QBDP}}}{29}{subfigure.2.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP + Aug}}}{29}{subfigure.2.3}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
