@@ -1,16 +1,16 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図．（左）通常のネットワーク (右)いくつかのニューロンがDropされたネットワーク\relax }}{5}{figure.caption.4}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Data Augmentationの例．Random Crop，Random Rotation，Random Flip，Random Color Augmentationを行った．\relax }}{6}{figure.caption.5}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Data Augmentationの例．Random Crop，Random Rotation，Random Flip，Random Color Augmentationを行った．{\color {red} (ToDo: {それぞれが何を表すのか})}\relax }}{6}{figure.caption.5}
 \contentsline {figure}{\numberline {2.3}{\ignorespaces 病理画像の例．{\color {red} (ToDo: {もうちょいいい感じのやつ})}\relax }}{7}{figure.caption.6}
 \contentsline {figure}{\numberline {2.4}{\ignorespaces 同じ細胞組織を異なる細胞スキャナーによって撮像したもの．色，解像度，輝度に大きな変化があることがわかる．\relax }}{8}{figure.caption.7}
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図\relax }}{15}{figure.caption.15}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する．\relax }}{16}{figure.caption.16}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める\relax }}{17}{figure.caption.17}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces 提案するQuery-By-Dropout-Predictionsの概要図。Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する．\relax }}{16}{figure.caption.16}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces 提案手法の動作原理のイメージ図。Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める。\relax }}{17}{figure.caption.17}
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{24}{figure.caption.27}
-\contentsline {figure}{\numberline {4.2}{\ignorespaces 各手法によってクエリとして選択されたサンプルを示す．\relax }}{26}{figure.caption.30}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces 各手法によってクエリとして選択されたサンプルの例．\relax }}{26}{figure.caption.30}
 \contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{26}{subfigure.2.1}
 \contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain Sampling}}}{26}{subfigure.2.2}
 \contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP}}}{26}{subfigure.2.3}

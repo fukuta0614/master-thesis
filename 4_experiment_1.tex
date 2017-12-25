@@ -11,18 +11,17 @@ Dropoutによってサンプリングされた各部分ネットワークの出�
 \subsection{データセットについて}
 MNISTは28×28ピクセルの手書き数字のデータセットである．
 7万枚の画像からなり，そのうちの6万枚は訓練画像，残りの1万枚はテスト画像として利用される．
-それぞれの画像は0~9までの数字ラベルが割り当てられているが，能動学習の状況を再現するため，
+それぞれの画像は0〜9までの数字ラベルが割り当てられているが，能動学習の状況を再現するため，
 クエリとして問い合わせられるまではラベルへのアクセスが与えられない状況を設定する．
 
 
 \subsection{実験の詳細}
 
-
 識別器にはCNNを利用する．その構造を表\ref{table:mnist_cnn}に示す．
 比較的小さなCNNであるため，クエリ問い合わせによってラベルが追加されるごとにfrom scratchで再学習を行うことにする．
 ただし毎回ランダムに初期化するのではなく，同じ初期値を利用することにする．
 これは，本来各iterationでクエリとして選択されるのはその時点でのモデルにとって有効なサンプルであり，
-ランダムに初期化してしまった場合その重要度が変化してしまうことを少しでも緩和するためである．
+パラメータを初期化するとそれらの重要度が変化してしまうという問題を少しでも緩和するためである．
 
 使用するCNNは多層ニューラルネットワークの中では小さいモデルではあるものの，ラベルを一つずつ追加して再学習を行うのは計算コストが大きいため，バッチ型能動学習を採用する．
 ここでも，同一クエリ内での情報の重複を避けるためクラスタリングを行う．
@@ -35,21 +34,19 @@ committeeサイズは10，k-meansのクラスター数$K$は100，一度に選�
 
 
 \begin{table}[h]
-    \label{table:mnist_cnn}
-    \caption{MNISTの実験に使用したCNNの構造を示す．（Kerasのexampleプログラムを参考にした．)}
+    
+    \caption{\label{table:mnist_cnn}MNISTの実験に使用したCNNの構造を示す．（Kerasのexampleプログラムを参考にした．)}
     \center
-    \begin{tabular}{|c|c|c|} \hline
-        layer & size & activation \\ \hline
-        Convolution & $32 \times 4 \times 4$ & relu \\
-        Convolution & $32 \times 4 \times 4$ & relu \\
-        Max Pooling & $2 \times 2$ & \\
-        dropout & & \\
-        fully connected & 128 & relu \\
-        dropout & & \\
-        fully connected & 128 & relu \\
+    \begin{tabular}{|c|c|c|c|} \hline
+        layer & size & activation & dropout ratio\\ \hline
+        Convolution & $32 \times 4 \times 4$ & relu & - \\
+        Convolution & $32 \times 4 \times 4$ & relu & - \\
+        Max Pooling & $2 \times 2$ & - & 0.25  \\ 
+        Fully Connected & 128 & relu & 0.5 \\
+        Fully Connected & 128 & relu & - \\
         \hline
     \end{tabular}
-  \end{table}
+\end{table}
 
 \subsection{比較手法について}
 提案するQuery-By-Dropout-Predictionsの性能を比較するため，いくつかの手法について実験を行った．
@@ -57,7 +54,7 @@ committeeサイズは10，k-meansのクラスター数$K$は100，一度に選�
 Random Sampling以外はクラスタリングによるクエリの情報重複の回避を行った．
 
 \subsubsection{Random Sampling}
-この実験のベースラインと言える選択基準．各クエリ問い合わせ毎にランダムに$\mathcal{U}$からサンプルを選択してラベル付きデータセットに追加する．
+この実験のベースラインとなる選択基準．各クエリ問い合わせ毎にランダムに$\mathcal{U}$からサンプルを選択してラベル付きデータセットに追加する．
 
 \subsubsection{Uncertainty Sampling}
 推論時にDropoutを使用せずに単一の予測分布のエントロピーを利用する．
@@ -130,14 +127,14 @@ Query-By-Dropout-Predictionsによって適切なクエリを選択できるす�
 \clearpage
 
 \section{実験結果}
-本項では上記で述べた実験の結果を示す．
+本項では上述した実験の結果を示す．
 クエリ選考基準として提案手法，比較手法それぞれを使用した際の，ラベル付きサンプル数の増加に対するテスト精度の変化のグラフを図\ref{fig:mnist_acc_graph}に示す．
 また，テストデータの識別精度が$90\%$，$95\%$，$98\%$を超えるのに要したラベルの数を表\ref{table:mnist_samplenum_accuracy}に示す．
 提案した手法がUncertain Samplingのみを使用した場合と比較して性能が良いことがわかる．
 これは上記に述べた通り多層ニューラルネットワークが正しくモデルの不確かさを表現できていないからだと推測される．
 さらに，推論時にもData Augmentationを利用することで，さらに少ないラベルで高精度を達成していることがわかる．
 それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較した図を表\ref{table:mnist_last_accuracy}に示す．
-表より，提案手法を用いた場合，全てのラベルを利用して達成される識別精度に匹敵する性能を，それらの約$2\%$のラベルで達成できていることがわかる．
+表より，提案手法を用いた場合，全てのラベルを利用して達成される識別精度に匹敵する性能を，それらの約$2\%$のラベル数で達成できていることがわかる．
 
 また，ラベル付きデータセットが100枚の際に，各手法によってクエリとして選択されたサンプルを図\ref{figure:mnist_query_examples}に示す．
 Random Sampling以外の手法は，Random Samplingと比較すると認識が困難であると考えられるサンプルを選択する傾向にある．
@@ -201,7 +198,7 @@ Uncertain Samplingではクラスタリングを行っているものの，数�
         \includegraphics[width=8cm]{figures/mnist_query_example_Uncertain+QBDP+AugOnInference.pdf}
             }
         }
-    \caption{\label{figure:mnist_query_examples}各手法によってクエリとして選択されたサンプルを示す．}
+    \caption{\label{figure:mnist_query_examples}各手法によってクエリとして選択されたサンプルの例．}
     \end{center}
 \end{figure}
 
