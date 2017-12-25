@@ -12,11 +12,11 @@ Camelyonデータセットは1000枚のWSIからなり、乳癌のリンパ節�
 ここでも、MNISTで行った実験と同様に各画像パッチのラベルは、クエリとして問い合わせない限り与えられない状況とする。
 
 \section{予備実験}
-\todo{都合の良い特徴量とか識別器を使ってるのずるいのかな。他のデータセットでやるべき？？}
+\todo{都合の良い特徴量とか識別器を使ってるのずるいのかな}
 
 \subsection{クラスタリング手法の比較}
 第3章で述べたクラスタリングに使用する特徴量を比較するために、それぞれの特徴量を用いて病理画像データセットをK-meansによってクラスタリングを行った際の
-各クラスター内のラベルの不純度を平均を計算した。不純度が小さいほどクラスター内でのばらつきが小さく良い特徴量だと言える\todo{ちょいあやしいか}。
+各クラスター内のラベルの不純度を平均を計算した。不純度が小さいほどクラスター内でのばらつきが小さく良い特徴量だと言える。
 データセットは100,000枚の病理画像からなり、癌と正常の割合は均等に調整した。
 使用したデータセットの詳細は第5章で説明する。
 表\ref{table:compare_feat}に示すように、CNNを用いたテクスチャ特徴量であるCompact Bilinear Poolingをクラスタリングに用いるのが妥当であると考えられる。
@@ -33,11 +33,41 @@ Camelyonデータセットは1000枚のWSIからなり、乳癌のリンパ節�
 \end{table}
 
 \subsection{線形識別器との比較}
-線形識別器はくそだよという話
+線形識別器による能動学習の研究は多数ある。
+ここで、特徴量を固定し線形識別器で学習した場合と特徴量も同時に学習した場合の精度を比較するために、
+病理画像データセットに対して実験を行った。
+識別機に用いるCNNはGoogLeNet \cite{szegedy2015going}を採用した。
+一般画像認識で利用される数多くのCNNアーキテクチャの中でも比較的計量で、
+医療画像解析でしばしば用いられるモデルであることから選択した。
+
+図\ref{table:compare_classifier}に示すように、特徴量に深層学習によって得られたものを使用した場合でも、
+特徴量を同時に学習したものは線形識別器の精度を遥かに上回る結果となった。
+また、通常のCNNよりも、Compact Bilinear Poolingによって空間の情報を落として
+テクスチャ特徴量として扱ったほうが良い識別精度を達成することを確認した。
+
+\begin{table}[h]
+  \caption{\label{table:compare_classifier}比較実験の結果}
+  \center
+  \begin{tabular}{c|c} \hline
+    手法 & Accuracy  \\ \hline
+    LBP + 線形SVM & 80.2 $\%$ \\
+    CNNの中間特徴量 + 線形SVM & 84.4 $\%$  \\ 
+    Compact Bilinear Pooling + 線形SVM & 86.0 $\%$ \\ \hline
+    CNN + finetune & \textbf{94.1} $\%$  \\ 
+    Compact Bilinear Pooling + finetune & \textbf{95.1} $\%$ \\ \hline
+  \end{tabular}
+\end{table}
+
 
 \section{実験の詳細}
-識別機に用いるCNNはGoogLeNetを採用した。他の一般画像認識で利用されるCNNのアーキテクチャの中でも比較的計量で、
-医療画像解析ではしばしば用いられるモデルであることから選択した。
+予備実験から、識別機に用いるCNNはGoogLeNetの中間特徴をCompact Bilinear Poolingによって圧縮し全結合層を接続する構造とした。
+以下に構造を示す（図\ref{figure:googlenet_cbp}）。
+\begin{figure}[tbp]
+   \begin{center}
+    \includegraphics[width=12cm]{figures/googlenet_cbp.pdf}
+   \end{center}
+  \caption{\label{fig:googlenet_cbp}GoogLeNetの特徴量をCompact Bilinear Poolingによって圧縮し、全結合層を接続した構造}
+\end{figure}
 少ないラベルで高精度を達成するために、ImageNetのpretrained-modelを初期値として、fine-tuningによって学習を行う。
 
 訓練時に使用するWSIから全ての画像パッチを抽出すると約5,000,000枚に登る。これをラベルなしデータセット$\mathcal{U}$とし、
@@ -63,19 +93,33 @@ committeeサイズは10, k-meansのクラスター数$K$は1000、一度に選�
 \section{実験結果}
 本項では上記で述べた実験の結果を示す。
 クエリ選考基準として提案手法、比較手法それぞれを使用した際の、ラベル付きサンプル数の増加に対するテスト精度の変化のグラフを図\ref{fig:camelyon_acc_graph}に示す。
-Mnistでの実験とは異なり、pretrained-modelからのfine-tuningを行っているため収束早いことがわかる。
-ここでも、
-これは上記に述べた通り多層ニューラルネットワークが正しくモデルの不確かさを表現できていないからだと推測される。
-さらに、推論時にもData Augmentationを利用することで、さらに少ないラベルで高精度を達成していることがわかる。
-また、ラベル付きデータセットが1000枚の際に、各手法によってクエリとして選択されたサンプルを図\ref{figure:camelyon_query_examples}に示す。
+pretrained-modelからのfine-tuningを行っているため、若干不安定ながら少ないラベルでも学習が進んでいることがわかる。
+Randomなベースラインと比較して、提案した手法は識別に有効なサンプルを選択できていることがわかる。
+さらに、Mnistの実験時よりも、推論時のData Augmentationの利用の効果が顕著に現れていることがわかる。
+それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と、ラベルを全て使った場合の識別精度の比較した図を表\ref{table:camelyon_last_accuracy}に示す。
+表より、提案手法を用いた場合、全てのラベルを利用して達成される識別精度にはやや劣るものの、比較して遜色ない性能を、10,000枚のラベルで達成することができた。
+これは、実際ラベル付きデータがパッチレベルでは数100万枚存在することを考慮すると、100分の1のラベル数で学習に成功したという事もできる。
+最後に、ラベル付きデータセットが1000枚の際に、各手法によってクエリとして選択されたサンプルを図\ref{figure:camelyon_query_examples}に示す。
 
 \begin{figure}[tbp]
-    \label{fig:camelyon_acc_graph}
      \begin{center}
       \includegraphics[width=12cm]{figures/camelyon_acc_graph.pdf}
      \end{center}
+    \label{fig:camelyon_acc_graph}
     \caption{各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}
 \end{figure}
+
+\begin{table}[h]
+  \caption{\label{table:camelyon_last_accuracy}それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と、ラベルを全て使った場合の識別精度の比較}
+  \center
+  \begin{tabular}{c|c} 
+       &  AUC \\ \hline
+      Random & 0.959 ± 0.002  \\
+      Uncertain + QBC + Clustering & 0.972 ± 0.002  \\ 
+      Uncertain + QBC + Clustering + DA & 0.975 ± 0.002  \\ \hline
+      Full label (60000 label) & 0.98
+  \end{tabular}
+\end{table}
 
 \begin{figure}[hbp]
   \begin{center}
@@ -100,4 +144,8 @@ Mnistでの実験とは異なり、pretrained-modelからのfine-tuningを行っ
 \end{figure}
 
 
-\section{考察}
+\section{まとめ}
+本研究で提案するシステムを大規模病理画像データセットに適用し、システムの有効性を検証した。
+病理画像解析においてCNNを用いてテクスチャ特徴量を利用しながらfine-tuningすることで、他の手法よりも性能が良いことを実験で示した。
+巨大なパラメータを持つCNNを採用し、識別精度を犠牲にすることなく、WSI全体の画像パッチ群と比較した場合アノテーションコストを1$\%$程度まで減らすことに成功した。
+また、それらを現実的な計算コストで実現を可能とした。

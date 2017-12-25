@@ -16,20 +16,14 @@ Convolutional Neural Network (CNN)とは、画像認識分野において近年�
 一般に機械学習では、訓練データに対する過学習を防ぎ汎化性能を向上させるために、モデルの正則化が行われる。
 ニューラルネットワークの正則化手法の一つにDropout\cite{hinton2012improving, srivastava2014dropout}がある。
 Dropoutとは、学習の過程において、ニューラルネットワークの中間層のニューロンを一定確率でランダムに"drop"する、すなわち出力を0にする正則化手法である（Fig. \ref{fig:dropout_network})。
-これは、任意のn次元中間層の出力$y_i$に対し、以下のようなマスク$M$をかけることで行われる。\todo{式}
-\begin{eqnarray}
-    \begin{split}
-        y'_i &=& y_i \otimes M \\
-        \\
-        M &=& [m_0, m_1, \dots, m_n],\;\; m_i \sim Bernoulli(\pi) 
-    \end{split}
-\end{eqnarray}
+これは、任意のn次元中間層の出力$y_i$に対し、以下のようなマスク$M$をかけることで行われる。
+\begin{eqnarray*}
+    y'_i &= y_i \otimes M 
+\end{eqnarray*}
+\begin{eqnarray*}
+    M &= [m_0, m_1, \dots, m_n],\;\; m_i \sim Bernoulli(\pi) 
+\end{eqnarray*}
 
-% \begin{eqnarray}
-%     y'_i &=& y_i \otimes M \\
-% % \end{eqnarray} y}
-%     M &=& [m_0, m_1, \dots, m_n],\;\; m_i \sim Bernoulli(\pi) 
-% \end{eqnarray}
 
 \begin{figure}[tbp]
     \begin{minipage}{0.5\hsize}
@@ -61,11 +55,10 @@ Data Augmentationとは、画像識別問題においてニューラルネット
 例を図\ref{fig:data_augmentation}に示す。
 
 \begin{figure}[tbp]
-    \label{fig:data_augmentation}
      \begin{center}
       \includegraphics[width=12cm]{figures/data_augmentation.pdf}
      \end{center}
-    \caption{Data Augmentationの例。Random Crop、Random Rotation、Random Flip、Random Color Augmentationを行った。}
+    \caption{\label{fig:data_augmentation}Data Augmentationの例。Random Crop、Random Rotation、Random Flip、Random Color Augmentationを行った。}
 \end{figure}
 
 \subsection{学習済みモデルからの転移学習}
@@ -121,15 +114,14 @@ ImageNetなどのデータセットをpretrained-modelの中間特徴量を抽�
 一般に医療画像解析に共通している特徴として、モデルが画像に対して獲得すべき不変性が多いということがある。
 特に病理画像解析では、各画像パッチは人手で切り取られたものであるので、モデルの予測は向き、回転、位置に対しては不変であることが強く求められる。
 また、病理画像はそもそも染色液によって細胞を染色することで核などの病理学的特徴を見つけ出すための画像であるが、
-その染まり方は細胞毎、研究機関毎に大きく異なる（\ref{fig:comparison_color}）。
+その染まり方は細胞毎、研究機関毎に大きく異なる（図\ref{fig:comparison_color}）。
 このことから、色相、輝度に対する不変性が強く必要とされる。
 
 \begin{figure}[tbp]
-    \label{fig:comparison_color}
      \begin{center}
       \includegraphics[width=13cm]{figures/comparison_color.pdf}
      \end{center}
-    \caption{同じ細胞組織を異なる細胞スキャナーによって撮像したもの。色、解像度、輝度に大きな変化があることがわかる。}
+    \caption{\label{fig:comparison_color}同じ細胞組織を異なる細胞スキャナーによって撮像したもの。色、解像度、輝度に大きな変化があることがわかる。}
         % ICPR 2014 MITOS-atypia challenge—http://mitos-atypia-14.grand-challenge.org
 \end{figure}
 
@@ -201,7 +193,6 @@ $\mathcal{L}$をラベル付きデータセット、$\mathcal{U}$をラベルな
 事後確率最大ラベルの確率と、その次に大きなラベルの確率との差が小さいサンプルを選択するMargin Sampling（式\ref{eq:margin}）、
 事後確率分布のエントロピーが大きいサンプルを選択するEntropy Sampling（式\ref{eq:entropy}）
 などが提案されている。
-\todo{式いい感じに}
 \begin{eqnarray}
     score(x) &=& 1 - P_{\theta}(\hat{y}|x)  \;\;  \label{eq:least_confident} \\ \nonumber \\ 
     score(x) &=& P_{\theta}(\hat{y}_1|x) - P_{\theta}(\hat{y}_2|x)  \;\;  \label{eq:margin}\\ \nonumber \\
@@ -266,7 +257,6 @@ $E_{\mathcal{L}}[\cdot]$はラベルセット$\mathcal{L}$に関する期待値�
 $s(\cdot)$はサンプル間の類似度を算出する関数である。
 
 \subsection{その他の関連する事項}
-\todo{章立て微妙}
 \subsubsection{サンプリングバイアス}
 能動学習では、学習主体が選択しアノテーションを付与されたデータ集合が実際のデータ集合とは異なるという問題がしばしば起こる。
 これをサンプリングバイアスと呼ぶ。これを緩和するために、しばしばクラスタリングなどにより実際のデータ集合に近づける手法が用いられる。
@@ -288,33 +278,35 @@ BrinkerとKlausらはクラスタリング手法によって同一クラスタ�
 
 能動学習を病理画像解析に利用した研究は複数存在する。
 複数人のWSIから切り出したパッチベースでの学習を行う病理画像解析では、クエリとしてWSI中の１領域を問い合わせるのが自然である。
-しかし、通常のデータ分布とは違い、独立同一分布でないという特徴がある。\todo{回収しないと}
+しかし、通常のデータ分布とは違い、独立同一分布でないため、能動学習を適用する場合サンプリングバイアスの影響を強く受けやすい。
 NalisNik et al.はUncertainty Samplingによる能動学習を比較的単純な細胞核segmentationタスクに応用した\cite{nalisnik2017interactive}。
 Doyle et al.は線形識別器を多数保持するquery-by-committeeを利用して癌検知の識別タスクを解こうと試みた\cite{doyle2011active}。
 また、Zhu et al.は画像パッチからテクスチャ特徴量を抽出し、線形識別器を採用して仮説空間の縮小をクエリ選考基準にすることで劣モジュラ最適化の枠組みを利用し、
 さらにk-meansによるクラスタリングによって効率的にクエリを選択し、癌のステージの識別に利用した\cite{zhu2014scalable}。
 しかし、そのほとんどが人手によって設計された特徴量に対して線形の識別器を用いているものであるため、精度の点で十分であるとは言えない。
-この事実に関しては第5章の予備実験で検証する。
+線形識別器の性能の限界は第5章の予備実験で検証する。
 
 \subsection{深層能動学習}
 能動学習の研究は、理論、実践的なアプリケーションどちらも線形識別器を用いているものが大半であるが、
 近年の深層学習の成果を受けて、深層学習と能動学習を組み合わせた研究も行われている\cite{6889457, li2016active}。
 これらのアプローチは、Restricted Boltzmann Machinesやstacked autoencodersなどによってpre-trainingを行ったネットワークを用いて、
-Uncertainty Samplingによるクエリ選択を行うというシンプルなものである。\todo{もうちょいかく}
-しかし、
+Uncertainty Samplingによるクエリ選択を行うというシンプルなものが多い。
+\todo{ここもう少し}
+
 
 \subsection{本研究の位置づけ}
 能動学習において深層学習を利用する研究の多くは、Uncertainty Samplingベースのクエリ選考基準を用いている。
 これらのアプローチでは、多層ニューラルネットワークの予測の不確かさを定量的に評価するために、出力の確率分布のエントロピーが大きさなどが利用されることが多い。
 しかし、一般に、多層ニューラルネットワークは自らの予測に対する不確かさを陽に表すようにモデル化されていない。
-仮に予測が0.9という高い確率であったとしても、確信度が高いことを示すわけではないという問題がある。\todo{非線形だからどこで間違ってるかわからん。}
-\todo{ベイスCNN触れないとな}
+仮に予測が0.9という高い確率であったとしても、確信度が高いことを示すわけではないという問題がある。\todo{例もしくは引用}
+また、予測が0.5であるのはサンプルそのものがノイズとして持つ不確かさなのか、モデルパラメータの不確かさによるものなのかの判断が単一の予測からは判断できない。
 
-本研究では、不確かさを陽にモデル化しない多層ニューラルネットワークを能動学習に効率的に組み込むために手法を提案し、
-精度を犠牲にすることなく、安定してアノテーションコストを削減する病理画像解析システムを提案する。
-多層ニューラルネットワークの識別精度向上に寄与すると考えられるサンプルを選択するために、Query-By-Committeeのアイデアを基に
-DropoutとData Augmentationを推論にも利用することにより近似的にそれらを達成するアプローチを取る。
-\todo{位置づけなのかこれは}
+本研究では、不確かさを陽にモデル化しない多層ニューラルネットワークを能動学習に効率的に組み込むために、
+Query-By-Committeeの考えを基に考案したQuery-By-Dropout-Predictionsを提案する。
+多層ニューラルネットワークの識別精度向上に寄与すると考えられるサンプルを選択するために、
+Dropoutによって本体のネットワークからサンプリングされた部分ネットワークをCommitteeとして利用し
+それらの不一致度を計算することで近似的にバージョン空間を縮小するサンプルを選択するアプローチである。
+また、その手法を利用し、識別精度を犠牲にすることなく、安定してアノテーションコストを削減する病理画像解析システムを構築する。
 
 \section{まとめ}
 本章では、本研究に関連するいくつかの研究の枠組みと、先行研究について述べた。

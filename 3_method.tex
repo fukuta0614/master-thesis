@@ -4,7 +4,7 @@
 本章では、本研究で提案するシステムについて説明する。
 本研究では、識別精度を犠牲にすることなくアノテーションコストを抑える病理画像解析のための深層能動学習システムを構築する。
 高精度を達成するために識別器にConvolutional Neural Networkを採用し、少ないラベル数でも学習を収束させるために
-ImageNetで学習済みのpretrained-networkの重みからfine-tuningして学習を行う。
+ImageNetで学習済みのpretrained-networkの重みをもとにfine-tuningによって学習を行う。
 一般画像認識のために学習されたモデルでも、医療画像解析への転移学習は幅広いタスクに対して有効であると知られているため、妥当だと考えられる。
 
 また、前章で述べた深層学習と能動学習の組み合わせの問題に対する解決するためのアプローチとして、Query-By-Dropout-Predictionsを提案する。
@@ -12,8 +12,9 @@ ImageNetで学習済みのpretrained-networkの重みからfine-tuningして学�
 正則化に使用されるDropoutを利用して擬似的にQuery-By-Committeeを再現する。
 さらに、医療画像解析において重要であると考えられる、様々な変形への不変性の担保を考慮し、
 各Committeeのprediction時にもランダムなData Augmentationを利用することで、
-識別に有効なサンプルのみではなく不変性を確保するために有効であるサンプルをクエリとして選択することを考える。\todo{あやしいぃ}
-また、能動学習において一般に問題となるサンプリングバイアスを解決するためにクラスタリング手法を採用し、
+識別に有効なサンプルのみではなく不変性を確保するために有効であるサンプルをクエリとして選択することを考える。
+また、WSIにおける大量の画像パッチを能動学習の枠組みで扱うための実用的な方法を提案する。
+さらに、能動学習において一般に問題となるサンプリングバイアスやバッチ能動学習におけるクエリ内の情報重複問題を解決するためにクラスタリング手法を採用し、
 その際に用いる特徴量について妥当だと考えられるものを実験から選定した。
 
 以下の節では、それぞれについて詳細を説明する。
@@ -41,21 +42,19 @@ Uncertainty Samplingによってクエリ選択を行う。
 本体のネットワークからサンプリングされた部分ネットワークをCommitteeとみなし、
 それらの予測の不一致度を利用して近似的にQuery-By-Committeeを行う手法を提案する（Fig.\ref{fig:query_by_dropout}）。
 つまり、本体のネットワーク$\mathcal{M}$から生成された部分ネットワーク$\mathcal{C} = \{\mathcal{M}_{p_1}, \mathcal{M}_{p_2}, \dots, \mathcal{M}_{p_c} \}$を用いて
-以下のAverage Kullback Divergenceを計算する。
+以下のKullback–Leiblerを計算する。
 \begin{eqnarray}
     score(x) =  -  \frac{1}{C} \sum_{c=i}^C KL \, (P_{\theta^{(c)}} || P_C)
 \end{eqnarray}
-\todo{disagreementだけじゃなくて不確かさも利用する話どこでしようかな}
 これらの部分ネットワークがCommitteeとして利用されるためには、それらが訓練データに対してはConsistentであり、
 かつ、それぞれの未知データに対する出力には分散を持つ必要がある。
 この性質について実験で検証し、Uncertainty Samplingのみを利用する方法と比較する。
 
 \begin{figure}[tbp]
-    \label{fig:query_by_dropout}
      \begin{center}
       \includegraphics[width=120mm]{figures/query_by_dropout.png}
      \end{center}
-    \caption{Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。}
+    \caption{\label{fig:query_by_dropout}Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する。}
 \end{figure}
 
 \section{推論時でのData Augmentationの利用}
@@ -69,17 +68,20 @@ CNNを学習させる際、訓練時に画像に対してData Augmentationを利
 
 \section{提案手法の動作原理}
 % pre-trained networkを利用する。
-通常Dropoutは全結合層のみで使用されることが多く、それらは識別境界を大きく変更させるためのサンプルを取得することができる。
-Data augmentationを利用することで\todo{このへん}
-図\ref{fig:how_it_works}
+通常Dropoutは全結合層のみで使用されることが多い。
+すなわち、Dropoutによってサンプリングされた各CommitteeはそれぞれCNNの畳み込み層から抽出された特徴量に対する識別境界面の引き方が異なっていると考えられる。
+この時、各Committeeの予測の不一致度が高くなるようなサンプルは識別境界を大きく変更させるために有効であると考えられる。
+しかしCNNは識別境界の決定だけでなく特徴抽出の表現学習も重要な因子である。
+そこで、訓練時のみではなく推論時にも各予測を出力するためにData Augmentationを利用することで識別境界の決定でなく
+特徴抽出のために有用であるサンプルを取得できるのではないかと考えられる。
+提案手法の動作原理のイメージ図を図\ref{fig:how_it_works}に示す
 
 
 \begin{figure}[tbp]
-    \label{fig:how_it_works}
      \begin{center}
       \includegraphics[width=120mm]{figures/how_it_works.pdf}
      \end{center}
-    \caption{Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める}
+    \caption{\label{fig:how_it_works}Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める}
 \end{figure}
 
 
