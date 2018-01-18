@@ -1,10 +1,13 @@
-Along with the spread of digital pathology technology, 
-many researches have been conducted to assist diagnosis of a pathologist using computational image analysis.
-On the other hand, it is often necessary to construct large-scale labeled dataset to acquire a model that achieves high classification ccuracy.
-Since training datasets in medical domain such as pathological images require highly specialized knowledge, 
-it becomes a heavy burden to the doctor and the annotation cost is very high.
-Therefore, in this research, we adopt active learning framework to alleviate this issue without sacrificing high accuracy.
-Active Learning is a framework which annotates only the infomatvie samples from an unlabeled image sets which are likely to improve a model accuracy.
-In addition to propose a method to apply active learning to pathological images, 
-we propose a new method for applying Convolutional Neural Network (CNN) to active learning.
-We experimented on the large scale pathological image datasets and verified its effectiveness.
+Along with the spread of digital pathology, many types of research have been conducted to support the diagnosis of a pathologist using computational image analysis.
+Generally, it is often necessary to construct large-scale labeled dataset to acquire a model that achieves high classification accuracy.
+However, the cost of preparing such dataset for pathological images is quite expensive.
+To make annotations to medical images such as pathological images requires highly specialized knowledge 
+and all the annotation work must be performed by doctor.
+
+Therefore, in this research, we aim to construct a system that acquires high accuracy model for pathological images while suppressing annotation cost.
+For thie approach, we adopt an Active Learning framework, which automaticaly select the informative samples from an unlabeled image set and request people to annotate.
+In addition, as a new method for applying Convolutional Neural Network (CNN) to active learning,
+we propose Query-By-Dropout-Predictions (QBDP) that utilizes the disagreement degree of prediction of partial network sampled by Dropout.
+
+As a result of the experiment, in general image dataset, we show that our method outperform conventional method.
+Furthermore, we applied proposed system to the large-scale pathological image dataset and demonstrate its effectiveness.

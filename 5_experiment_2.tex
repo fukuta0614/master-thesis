@@ -36,7 +36,7 @@ Camelyonデータセットは1000枚のWSIからなり，乳癌のリンパ節�
 ここで，特徴量を固定し線形識別器で学習した場合と特徴量も同時に学習した場合の精度を比較するために，
 病理画像データセットに対して実験を行った．
 識別機に用いるCNNはGoogLeNet \cite{szegedy2015going}を採用した．
-一般画像認識で利用される数多くのCNNアーキテクチャの中でも比較的計量で，
+一般画像認識で利用される数多くのCNNアーキテクチャの中でも比較的軽量で，
 医療画像解析でしばしば用いられるモデルであることから選択した．
 
 図\ref{table:compare_classifier}に示すように，特徴量に深層学習によって得られたものを使用した場合でも，
@@ -104,8 +104,7 @@ Randomなベースラインと比較して，提案した手法は識別に有�
      \begin{center}
       \includegraphics[width=12cm]{figures/camelyon_acc_graph.pdf}
      \end{center}
-    \label{fig:camelyon_acc_graph}
-    \caption{各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}
+    \caption{\label{fig:camelyon_acc_graph}各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図}
 \end{figure}
 
 \begin{table}[h]

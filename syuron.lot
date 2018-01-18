@@ -2,15 +2,15 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces MNISTの実験に使用したCNNの構造を示す．（Kerasのexampleプログラムを参考にした．)\relax }}{21}{table.caption.21}
-\contentsline {table}{\numberline {4.2}{\ignorespaces Dropoutからサンプリングされた部分ネットワークの予測を計測した実験の結果\relax }}{23}{table.caption.26}
-\contentsline {subtable}{\numberline {(a)}{\ignorespaces {識別精度}}}{23}{subtable.2.1}
-\contentsline {subtable}{\numberline {(b)}{\ignorespaces {不一致度}}}{23}{subtable.2.2}
-\contentsline {table}{\numberline {4.3}{\ignorespaces それぞれのクエリ選考基準を利用した場合にテスト精度を達成するために要したラベルの数\relax }}{25}{table.caption.28}
-\contentsline {table}{\numberline {4.4}{\ignorespaces それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較\relax }}{25}{table.caption.29}
+\contentsline {table}{\numberline {4.1}{\ignorespaces MNISTの実験に使用したCNNの構造を示す．（Kerasのexampleプログラムを参考にした．)\relax }}{22}{table.caption.21}
+\contentsline {table}{\numberline {4.2}{\ignorespaces Dropoutからサンプリングされた部分ネットワークの予測を計測した実験の結果\relax }}{24}{table.caption.26}
+\contentsline {subtable}{\numberline {(a)}{\ignorespaces {識別精度}}}{24}{subtable.2.1}
+\contentsline {subtable}{\numberline {(b)}{\ignorespaces {不一致度}}}{24}{subtable.2.2}
+\contentsline {table}{\numberline {4.3}{\ignorespaces それぞれのクエリ選考基準を利用した場合にテスト精度を達成するために要したラベルの数\relax }}{26}{table.caption.28}
+\contentsline {table}{\numberline {4.4}{\ignorespaces それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較\relax }}{26}{table.caption.29}
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces 比較実験の結果\relax }}{28}{table.caption.31}
-\contentsline {table}{\numberline {5.2}{\ignorespaces 比較実験の結果\relax }}{28}{table.caption.32}
-\contentsline {table}{\numberline {5.3}{\ignorespaces それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較\relax }}{31}{table.caption.35}
+\contentsline {table}{\numberline {5.1}{\ignorespaces 比較実験の結果\relax }}{29}{table.caption.31}
+\contentsline {table}{\numberline {5.2}{\ignorespaces 比較実験の結果\relax }}{29}{table.caption.32}
+\contentsline {table}{\numberline {5.3}{\ignorespaces それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較\relax }}{32}{table.caption.35}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
