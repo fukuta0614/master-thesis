@@ -78,7 +78,7 @@ Dropoutを利用し十分に学習されたネットワークの部分ネット�
 \end{eqnarray}
 
 アルゴリズムの詳細をAlgorithm.\ref{algo:qbdp}に示す．
-これらの部分ネットワークがCommitteeのメンバとして利用されるための条件としてあげた二つの性質について実験で検証し，
+これらの部分ネットワークがCommitteeのメンバとして利用されるための条件としてあげた２つの性質について実験で検証し，
 Uncertainty Samplingのみを利用する方法と比較する．
 
 \begin{figure}[tbp]
@@ -160,7 +160,7 @@ CNNを学習させる際，訓練時に画像に対してData Augmentationを利
 この中からモデル更新に寄与するサンプルを選択することで，現実時間内で最適なクエリを探索可能にしつつ，
 利用可能データを最大限に利用する方法を提案する．
 画像パッチをサンプリングする際は，各WSIから均等に選択する．
-また，画像パッチの近傍は似た画像が多いことを考慮し，ある領域から二枚以上の画像パッチが選択されないように気をつけて行う．
+また，画像パッチの近傍は似た画像が多いことを考慮し，ある領域から２枚以上の画像パッチが選択されないように気をつけて行う．
 さらに，一度選択された領域は次のサンプリングでは避けるようにする．
 
 \subsection{バッチ型能動学習への拡張}
@@ -207,7 +207,7 @@ CNNを用いたテクスチャ特徴量として，GoogleNet\cite{szegedy2015goi
     \item[step5] K-meansによって$\mathcal{U}_i$を$\mathcal{U}_{i_1}, \mathcal{U}_{i_2}, \dots, \mathcal{U}_{i_k}$にクラスタリングする
     \item[step6] Dropoutにより$\mathcal{L}$からCommittee $\mathcal{C} = \{\mathcal{M}_{p_1}, \mathcal{M}_{p_2}, \dots, \mathcal{M}_{p_c} \}$を生成
     \item[step7] Committee $\mathcal{C}$ を利用し$\mathcal{U}$のdisagreement scoreを計算
-    \item[step8] $\mathcal{U}$からスコアが高いものを，同一クラスターからは二つ以上選択しないように選び，クエリ$Q$を作成
+    \item[step8] $\mathcal{U}$からスコアが高いものを，同一クラスターからは２つ以上選択しないように選び，クエリ$Q$を作成
     \item[step9] $Q$にラベルを付与し，$\mathcal{L}$に追加する
     \item[step10] モデルのvalidation scoreが望みの値を達成するまでstep3〜step9を繰り返す
 \end{description}
