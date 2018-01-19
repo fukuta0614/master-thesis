@@ -1,26 +1,36 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Dropoutの模式図．（左）通常のネットワーク (右)いくつかのニューロンがDropされたネットワーク\relax }}{5}{figure.caption.4}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces １枚の病理画像パッチに対してData Augmentationを行った例．ここでは、Random Crop，Random Rotation，Random Flip，Random Color Augmentationを使用した．\relax }}{6}{figure.caption.5}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces １枚の病理画像パッチに対してData Augmentationを行った例．ここでは，Random Crop，Random Rotation，Random Flip，Random Color Augmentationを使用した．\relax }}{6}{figure.caption.5}
 \contentsline {figure}{\numberline {2.3}{\ignorespaces 病理画像の例．\relax }}{7}{figure.caption.6}
 \contentsline {figure}{\numberline {2.4}{\ignorespaces 同じ細胞組織を異なる細胞スキャナーによって撮像したもの．色，解像度，輝度に大きな変化があることがわかる．\relax }}{8}{figure.caption.7}
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces 本研究で提案するシステムの概念図\relax }}{16}{figure.caption.15}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces 提案するQuery-By-Dropout-Predictionsの概要図．Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する．\relax }}{17}{figure.caption.16}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces 提案手法の動作原理のイメージ図．Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める．\relax }}{18}{figure.caption.17}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces 提案するQuery-By-Dropout-Predictionsの概要図．Dropoutによってサンプリングされた部分ネットワークによってCommitteeを形成する．\relax }}{18}{figure.caption.16}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces 提案手法の動作原理のイメージ図．Dropoutによる不一致度の定量評価をData Augmentationを併用することで効果を高める．\relax }}{19}{figure.caption.17}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{25}{figure.caption.27}
-\contentsline {figure}{\numberline {4.2}{\ignorespaces 各手法によってクエリとして選択されたサンプルの例．\relax }}{27}{figure.caption.30}
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{27}{subfigure.2.1}
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain Sampling}}}{27}{subfigure.2.2}
-\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP}}}{27}{subfigure.2.3}
-\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Uncertain + QBDP + Aug}}}{27}{subfigure.2.4}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図（$k=10$）\relax }}{27}{figure.caption.27}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces それぞれのクエリ選考基準を利用した場合にテスト精度を達成するために要したラベルの数\relax }}{28}{figure.caption.28}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$k=5$}}}{28}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$k=10$}}}{28}{subfigure.2.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$k=50$}}}{28}{subfigure.2.3}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces それぞれのクエリ選考基準を利用して構築された1000枚のラベル付きデータセットを学習した識別精度と，ラベルを全て使った場合の識別精度の比較\relax }}{29}{figure.caption.29}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$k=5$}}}{29}{subfigure.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$k=10$}}}{29}{subfigure.3.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$k=50$}}}{29}{subfigure.3.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces 各手法によってクエリとして選択されたサンプルの例．\relax }}{30}{figure.caption.30}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{30}{subfigure.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain Sampling}}}{30}{subfigure.4.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP}}}{30}{subfigure.4.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Uncertain + QBDP + Aug}}}{30}{subfigure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces サンプルの中間特徴量を２次元にt-SNEによって射影し，各手法によってどのサンプルが選択されているかを表した図．\relax }}{31}{figure.caption.31}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces GoogLeNetの特徴量をCompact Bilinear Poolingによって圧縮し，全結合層を接続した構造\relax }}{30}{figure.caption.33}
-\contentsline {figure}{\numberline {5.2}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{31}{figure.caption.34}
-\contentsline {figure}{\numberline {5.3}{\ignorespaces 各手法によってクエリとして選択されたサンプルを示す．\relax }}{32}{figure.caption.36}
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{32}{subfigure.3.1}
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain + QBDP}}}{32}{subfigure.3.2}
-\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP + Aug}}}{32}{subfigure.3.3}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Camelyon Datasetに含まれるWSIの例．詳細なアノテーションが付与されている（青枠内部が癌）．癌周辺の組織を$256 \times 256$のサイズの画像パッチに分割すると右の図のようになる．\relax }}{34}{figure.caption.32}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces GoogLeNetの特徴量をCompact Bilinear Poolingによって圧縮し，全結合層を接続した構造\relax }}{36}{figure.caption.35}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces 各手法を利用した場合のラベル付きサンプル数の増加に対するテスト精度の変化を示した図\relax }}{37}{figure.caption.36}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces 各手法によってクエリとして選択されたサンプルを示す．\relax }}{37}{figure.caption.38}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Random Sampling}}}{37}{subfigure.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Uncertain + QBDP}}}{37}{subfigure.4.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Uncertain + QBDP + Aug}}}{37}{subfigure.4.3}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
